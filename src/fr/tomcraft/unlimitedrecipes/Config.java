@@ -73,22 +73,37 @@ public class Config {
 				int quantity = crafting.getInt("config.crafts."+key+".quantity");
 				ArrayList<String> recipe = (ArrayList<String>) crafting.getStringList("config.crafts."+key+".recipe");
 				ShapedRecipe recipes = new ShapedRecipe(new ItemStack(toCraft, quantity, metadata));
-				recipes.shape(recipe.get(0), recipe.get(1), recipe.get(2));
+				
+				String[] shape = new String[3];
+				
+				shape[0] = ((recipe.size() >= 1 && recipe.get(0) != null) ? recipe.get(0) : "   ");
+				shape[1] = ((recipe.size() >=2 && recipe.get(1) != null) ? recipe.get(1) : "   ");
+				shape[2] = ((recipe.size() == 3 && recipe.get(2) != null) ? recipe.get(2) : "   ");
+				
+				recipes.shape(shape);
 
 				Set<String> keys2 = crafting.getConfigurationSection("config.crafts."+key+".ingredientsID").getKeys(false);
 				for(String key2 : keys2){
 					ConfigurationSection section2 = crafting.getConfigurationSection("config.crafts."+key+".ingredientsID");
 					char c = key2.charAt(0);
 					int meta = 0;
-					Material meterial = Material.getMaterial(Integer.parseInt(section2.getString(key2)));
+					Material material;
 					
 					if(section2.getString(key2).contains(":"))
 					{
 						meta = Integer.parseInt(section2.getString(key2).split(":")[1]);
-						meterial = Material.getMaterial(Integer.parseInt(section2.getString(key2).split(":")[0]));
+						material = Material.getMaterial(Integer.parseInt(section2.getString(key2).split(":")[0]));
 					}
-					
-					recipes.setIngredient(c, meterial, meta);
+					else
+					{
+						material = Material.getMaterial(Integer.parseInt(section2.getString(key2)));
+					}
+					try{
+						recipes.setIngredient(c, material, meta);
+					}catch(Exception e)
+					{
+						
+					}
 				}
 				plugin.getServer().addRecipe(recipes);
 				System.out.println("[UnlimitedRecipes] Crafting Recipe for: "+toCraft.name()+" added !");
@@ -114,6 +129,7 @@ public class Config {
 				FurnaceRecipe recipe = new FurnaceRecipe(new ItemStack(material, 1, metaResult), ingredient, metaIngredient);
 				
 				plugin.getServer().addRecipe(recipe);
+				
 				System.out.println("[UnlimitedRecipes] Furnace Recipe for: "+material.name()+" added !");
 			}
 			
