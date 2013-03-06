@@ -167,6 +167,7 @@ public class Config {
 		list.add("aba");
 		list.add("aaa");
 		crafting.set("config.crafts.ice.recipe", list);
+		crafting.set("config.crafts.ice.override", false);
 		crafting.set("config.crafts.ice.ingredientsID.a", "80:0");
 		crafting.set("config.crafts.ice.ingredientsID.b", "326:0");
 		
@@ -179,6 +180,7 @@ public class Config {
 		list2.add("aca");
 		list2.add("aca");
 		crafting.set("config.crafts.saddle.recipe", list2);
+		crafting.set("config.crafts.saddle.override", false);
 		crafting.set("config.crafts.saddle.ingredientsID.a", "334:0");
 		crafting.set("config.crafts.saddle.ingredientsID.b", "287:0");
 		crafting.set("config.crafts.saddle.ingredientsID.c", "265:0");
@@ -192,6 +194,7 @@ public class Config {
 
 		furnace.set("config.smelts.netherrack.ingredientID", 1);
 		furnace.set("config.smelts.netherrack.ingredient_MetaData", 0);
+		furnace.set("config.smelts.netherrack.override", false);
 	}
 
 	public void saveCraftingConfig()
