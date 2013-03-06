@@ -7,12 +7,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Material;
-import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
@@ -72,13 +69,24 @@ public class Config {
 				short metadata = (short)crafting.getInt("config.crafts."+key+".metadata");
 				int quantity = crafting.getInt("config.crafts."+key+".quantity");
 				ArrayList<String> recipe = (ArrayList<String>) crafting.getStringList("config.crafts."+key+".recipe");
+				
 				ShapedRecipe recipes = new ShapedRecipe(new ItemStack(toCraft, quantity, metadata));
+				
+				if(crafting.get("config.crafts."+key+".override") == null)
+				{
+					crafting.set("config.crafts."+key+".override", false);
+				}
+				
+				if(crafting.getBoolean("config.crafts."+key+".override"))
+				{
+					plugin.overidenCrafts.add(recipes.getResult());
+				}
 				
 				String[] shape = new String[3];
 				
 				shape[0] = ((recipe.size() >= 1 && recipe.get(0) != null) ? recipe.get(0) : "   ");
 				shape[1] = ((recipe.size() >=2 && recipe.get(1) != null) ? recipe.get(1) : "   ");
-				shape[2] = ((recipe.size() == 3 && recipe.get(2) != null) ? recipe.get(2) : "   ");
+				shape[2] = ((recipe.size() == 3 && recipe.get(2) != null) ? recipe.get(2) : null);
 				
 				recipes.shape(shape);
 
@@ -125,8 +133,18 @@ public class Config {
 
 				Material ingredient = Material.getMaterial(furnace.getInt("config.smelts."+key+".ingredientID"));
 				short metaIngredient = (short) furnace.getInt("config.smelts."+key+".ingredient_MetaData");
-
+				
+				if(furnace.get("config.smelts."+key+".override") == null)
+				{
+					furnace.set("config.smelts."+key+".override", false);
+				}
+				
 				FurnaceRecipe recipe = new FurnaceRecipe(new ItemStack(material, 1, metaResult), ingredient, metaIngredient);
+				
+				if(furnace.getBoolean("config.smelts."+key+".override"))
+				{
+					plugin.overidenSmelts.add(recipe.getResult());
+				}				
 				
 				plugin.getServer().addRecipe(recipe);
 				
