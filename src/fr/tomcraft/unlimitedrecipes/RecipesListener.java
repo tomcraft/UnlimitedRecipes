@@ -15,16 +15,20 @@ public class RecipesListener implements Listener{
 	@EventHandler
 	public void onPlayerCraftEvent(CraftItemEvent e)
 	{
-		if(plugin.overidenCrafts.contains(e.getRecipe())){
-			e.setCancelled(true);
+		if(!plugin.customCrafts.contains(e.getRecipe()))
+		{
+			if(plugin.overidenCrafts.contains(e.getRecipe().getResult()))
+				e.setCancelled(true);
 		}
 	}
 	
 	@EventHandler
 	public void onPlayerSmeltEvent(org.bukkit.event.inventory.FurnaceSmeltEvent e)
 	{
-		if(plugin.overidenSmelts.contains(e.getResult())){
-			e.setCancelled(true);
+		if(!plugin.customSmelts.contains(e.getResult()))
+		{
+			if(plugin.overidenSmelts.get(e.getResult()) != e.getSource())
+				e.setCancelled(true);
 		}
 	}
 	

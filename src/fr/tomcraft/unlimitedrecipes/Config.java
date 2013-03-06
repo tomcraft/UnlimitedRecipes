@@ -143,7 +143,7 @@ public class Config {
 				
 				if(furnace.getBoolean("config.smelts."+key+".override"))
 				{
-					plugin.overidenSmelts.add(recipe.getResult());
+					plugin.overidenSmelts.put(recipe.getResult(), recipe.getInput());
 				}				
 				
 				plugin.getServer().addRecipe(recipe);

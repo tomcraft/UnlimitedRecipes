@@ -1,11 +1,13 @@
 package fr.tomcraft.unlimitedrecipes;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,12 +15,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin{
 
 	public Config config;
+	public ArrayList<Recipe> customCrafts;
 	public ArrayList<ItemStack> overidenCrafts;
-	public ArrayList<ItemStack> overidenSmelts;
+	public ArrayList<FurnaceRecipe> customSmelts;
+	public HashMap<ItemStack, ItemStack> overidenSmelts;
 
 	public void onEnable(){
 		overidenCrafts = new ArrayList<ItemStack>();
-		overidenSmelts = new ArrayList<ItemStack>();
+		overidenSmelts = new HashMap<ItemStack, ItemStack>();
 		config = new Config(this);
 		config.loadConfigs();
 	}
