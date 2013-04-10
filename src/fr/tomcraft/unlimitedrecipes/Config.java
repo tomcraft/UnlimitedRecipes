@@ -16,6 +16,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.meta.SkullMeta;
 
 public class Config {
 
@@ -71,11 +72,28 @@ public class Config {
 			for(String key : keys){
 
 				Material toCraft = Material.getMaterial(crafting.getInt("config.crafts."+key+".itemID"));
-				short metadata = (short)crafting.getInt("config.crafts."+key+".metadata");
+				Object metad = crafting.get("config.crafts."+key+".metadata");
+				short metadata = 0;
 				int quantity = crafting.getInt("config.crafts."+key+".quantity");
 				ArrayList<String> recipe = (ArrayList<String>) crafting.getStringList("config.crafts."+key+".recipe");
-
-				ShapedRecipe recipes = new ShapedRecipe(new ItemStack(toCraft, quantity, metadata));
+				
+				ItemStack shpedre;
+				
+				if(metad instanceof String && (toCraft == Material.SKULL || toCraft == Material.SKULL_ITEM))
+				{
+					System.out.println(metad);
+					shpedre = new ItemStack(toCraft, quantity, (short) 3);
+					SkullMeta meta = (SkullMeta)shpedre.getItemMeta();
+					meta.setOwner(String.valueOf(metad));
+					shpedre.setItemMeta(meta);
+				}
+				else
+				{
+					metadata = (short)crafting.getInt("config.crafts."+key+".metadata");
+					shpedre = new ItemStack(toCraft, quantity, metadata);
+				}
+				
+				ShapedRecipe recipes = new ShapedRecipe(shpedre);
 
 				if(crafting.getBoolean("config.crafts."+key+".override"))
 				{
@@ -87,7 +105,7 @@ public class Config {
 				for(int i = 0; i < shape.length; i++)
 				{
 					shape[i] = recipe.get(i);
-				}			
+				}
 
 				recipes.shape(shape);
 
@@ -139,7 +157,7 @@ public class Config {
 		if(furnace.getConfigurationSection("config.smelts") != null){
 			Set<String> keys = furnace.getConfigurationSection("config.smelts").getKeys(false);
 			for(String key : keys){
-				ConfigurationSection section = furnace.getConfigurationSection("config.smelts");
+				//ConfigurationSection section = furnace.getConfigurationSection("config.smelts");
 
 				Material material = Material.getMaterial(furnace.getInt("config.smelts."+key+".resultID"));
 				short metaResult = (short) furnace.getInt("config.smelts."+key+".result_MetaData");
@@ -196,24 +214,20 @@ public class Config {
 					out.write(buf, 0, len);
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} finally {
 				try {
 					out.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			try {
 				is.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
