@@ -1,0 +1,177 @@
+# You can get all minecraft IDs on this page: http://www.minecraftinfo.com/IDList.htm
+config:
+  crafts:
+    # water + snow = ice
+    ice:
+      itemID: 79
+      metadata: 0
+      quantity: 2
+      recipe:
+      - 'aaa'
+      - 'aba'
+      - 'aaa'
+      override: false
+      ingredientsID:
+        a: '80:0x1'
+        b: '326:0x1'
+
+    # vines + cobblestone = moss stone 
+    mossstone01:
+      itemID: 48
+      metadata: 0
+      quantity: 1
+      recipe:
+      - 'aaa'
+      - 'aba'
+      - 'aaa'
+      override: false
+      ingredientsID:
+        a: '106:0x1'
+        b: '4:0x1'
+
+    # vines + stone bricks = mossy stone bricks
+    mossbricks01:
+      itemID: 98
+      metadata: 1
+      quantity: 1
+      recipe:
+      - 'aaa'
+      - 'aba'
+      - 'aaa'
+      override: false
+      ingredientsID:
+        a: '106:0x1'
+        b: '98:0x1'
+
+    # tall grass + stone bricks = mossy stone bricks
+    mossbricks02:
+      itemID: 98
+      metadata: 1
+      quantity: 1
+      recipe:
+      - 'aaa'
+      - 'aba'
+      - 'aaa'
+      override: false
+      ingredientsID:
+        a: '106:0x1'
+        b: '31:1x1'
+
+    # stone bricks = cracked stone bricks
+    crackedbricks:
+      itemID: 98
+      metadata: 2
+      quantity: 9
+      recipe:
+      - 'aaa'
+      - 'aaa'
+      - 'aaa'
+      override: false
+      ingredientsID:
+        a: '98:0x1'
+
+    # stone brick slab = chiseled stone bricks
+    chiseledbricks:
+      itemID: 98
+      metadata: 3
+      quantity: 4
+      recipe:
+      - 'aa'
+      - 'aa'
+      override: false
+      ingredientsID:
+        a: '44:5'
+
+    # coal + stone = coal ore
+    coalblock01:
+      itemID: 16
+      metadata: 0
+      quantity: 1
+      recipe:
+      - 'aaa'
+      - 'aba'
+      - 'aaa'
+      override: false
+      ingredientsID:
+        a: '263:0x1'
+        b: '1:0x1'
+
+    # piston + redstone torch + lava + coal ore = diamond ore
+    diamond:
+      itemID: 56
+      metadata: 0
+      quantity: 1
+      recipe:
+      - 'bab'
+      - 'ada'
+      - 'cac'
+      override: false
+      ingredientsID:
+        a: '33:0x1'
+        b: '76:0x1'
+        c: '327:0x1'
+        d: '16:0x1'
+
+    # gunpowder + end stone = 2x TNT
+    dynamite01:
+      itemID: 46
+      metadata: 0
+      quantity: 2
+      recipe:
+      - 'aba'
+      - 'bab'
+      - 'aba'
+      override: false
+      ingredientsID:
+        a: '289:0x1'
+        b: '121:0x1'
+
+    # iron bars = chain helmet
+    chainhelmet:
+      itemID: 302
+      metadata: 0
+      quantity: 1
+      recipe:
+      - 'aaa'
+      - 'a a'
+      override: false
+      ingredientsID:
+        a: '101:0x1'
+
+    # iron bars = chain chestplate
+    chainchestplate:
+      itemID: 303
+      metadata: 0
+      quantity: 1
+      recipe:
+      - 'a a'
+      - 'aaa'
+      - 'aaa'
+      override: false
+      ingredientsID:
+        a: '101:0x1'
+
+    # iron bars = chain leggings
+    chainleggings:
+      itemID: 304
+      metadata: 0
+      quantity: 1
+      recipe:
+      - 'aaa'
+      - 'a a'
+      - 'a a'
+      override: false
+      ingredientsID:
+        a: '101:0x1'
+
+    # iron bars = chain boots
+    chainboots:
+      itemID: 305
+      metadata: 0
+      quantity: 1
+      recipe:
+      - 'a a'
+      - 'a a'
+      override: false
+      ingredientsID:
+        a: '101:0x1'

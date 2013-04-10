@@ -1,9 +1,12 @@
 package fr.tomcraft.unlimitedrecipes;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Material;
@@ -24,11 +27,25 @@ public class Config {
 
 	public FileConfiguration furnace;
 
-	public Config(Main plugin) {
+	public Config(Main plugin){
 		this.plugin = plugin;
 		this.defaultConfig = plugin.getConfig();
-		crafting = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "crafting.yml"));
-		furnace = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "furnace.yml"));
+		File crafting = new File(plugin.getDataFolder(), "crafting.yml");
+		File furnace = new File(plugin.getDataFolder(), "furnace.yml");
+		if(!crafting.exists())
+		{
+			this.extractFile("crafting.yml");
+
+		}
+		
+		this.crafting = YamlConfiguration.loadConfiguration(crafting);
+
+		if(!furnace.exists())
+		{
+			this.extractFile("furnace.yml");
+		}
+		
+		this.furnace = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "furnace.yml"));
 	}
 
 	public void loadConfigs()
@@ -39,24 +56,12 @@ public class Config {
 
 	public void loadCraftingConfig()
 	{
-		if(crafting.get("config") == null)
-		{
-			setCraftingDefaultConfig();
-			this.saveCraftingConfig();
-		}
-
 		loadCraftingRecipes();
 	}
 
 	public void loadFurnaceConfig()
 	{
-		if(furnace.get("config") == null)
-		{
-			setFurnaceDefaultConfig();
-			this.saveFurnaceConfig();
-		}
-			loadFurnaceRecipes();
-		
+		loadFurnaceRecipes();
 	}
 
 	public void loadCraftingRecipes()
@@ -69,52 +74,60 @@ public class Config {
 				short metadata = (short)crafting.getInt("config.crafts."+key+".metadata");
 				int quantity = crafting.getInt("config.crafts."+key+".quantity");
 				ArrayList<String> recipe = (ArrayList<String>) crafting.getStringList("config.crafts."+key+".recipe");
-				
+
 				ShapedRecipe recipes = new ShapedRecipe(new ItemStack(toCraft, quantity, metadata));
-				
-				if(crafting.get("config.crafts."+key+".override") == null)
-				{
-					crafting.set("config.crafts."+key+".override", false);
-				}
-				
+
 				if(crafting.getBoolean("config.crafts."+key+".override"))
 				{
-					plugin.overidenCrafts.add(recipes.getResult());
+					plugin.overidenCrafts.put(recipes.getResult().getTypeId()+":"+recipes.getResult().getDurability(), recipes);
 				}
-				
-				String[] shape = new String[3];
-				
-				shape[0] = ((recipe.size() >= 1 && recipe.get(0) != null) ? recipe.get(0) : "   ");
-				shape[1] = ((recipe.size() >=2 && recipe.get(1) != null) ? recipe.get(1) : "   ");
-				shape[2] = ((recipe.size() == 3 && recipe.get(2) != null) ? recipe.get(2) : null);
-				
+
+				String[] shape = new String[recipe.size()];
+
+				for(int i = 0; i < shape.length; i++)
+				{
+					shape[i] = recipe.get(i);
+				}			
+
 				recipes.shape(shape);
 
 				Set<String> keys2 = crafting.getConfigurationSection("config.crafts."+key+".ingredientsID").getKeys(false);
 				for(String key2 : keys2){
 					ConfigurationSection section2 = crafting.getConfigurationSection("config.crafts."+key+".ingredientsID");
 					char c = key2.charAt(0);
-					int meta = 0;
+					short meta = 0;
+					int quantityIng = 1;
 					Material material;
-					
-					if(section2.getString(key2).contains(":"))
+
+					if(section2.getString(key2).contains(":") && section2.getString(key2).contains("x"))
 					{
-						meta = Integer.parseInt(section2.getString(key2).split(":")[1]);
+						meta = Short.parseShort(section2.getString(key2).split(":")[1].split("x")[0]);
 						material = Material.getMaterial(Integer.parseInt(section2.getString(key2).split(":")[0]));
+						quantityIng = Integer.parseInt(section2.getString(key2).split("x")[1]);
+					}
+					else if(section2.getString(key2).contains(":"))
+					{
+						meta = Short.parseShort(section2.getString(key2).split(":")[1]);
+						material = Material.getMaterial(Integer.parseInt(section2.getString(key2).split(":")[0]));
+					}
+					else if(section2.getString(key2).contains("x"))
+					{
+						meta = Short.parseShort(section2.getString(key2).split("x")[0]);
+						material = Material.getMaterial(Integer.parseInt(section2.getString(key2).split(":")[0]));
+						quantityIng = Integer.parseInt(section2.getString(key2).split("x")[1]);
 					}
 					else
 					{
 						material = Material.getMaterial(Integer.parseInt(section2.getString(key2)));
 					}
+
 					try{
-						recipes.setIngredient(c, material, meta);
-					}catch(Exception e)
-					{
-						
-					}
+						recipes.setIngredient(c, new ItemStack(material, quantityIng, meta).getData());
+					}catch(Exception e){}
 				}
+				plugin.customCrafts.add(recipes.getIngredientMap());
 				plugin.getServer().addRecipe(recipes);
-				System.out.println("[UnlimitedRecipes] Crafting Recipe for: "+toCraft.name()+" added !");
+				System.out.println("[UnlimitedRecipes] Crafting Recipe for: "+toCraft.name()+":"+metadata+" added !");
 			}
 			System.out.println("[UnlimitedRecipes] All craft recipes loaded !");
 		}
@@ -127,74 +140,27 @@ public class Config {
 			Set<String> keys = furnace.getConfigurationSection("config.smelts").getKeys(false);
 			for(String key : keys){
 				ConfigurationSection section = furnace.getConfigurationSection("config.smelts");
-				
+
 				Material material = Material.getMaterial(furnace.getInt("config.smelts."+key+".resultID"));
 				short metaResult = (short) furnace.getInt("config.smelts."+key+".result_MetaData");
 
 				Material ingredient = Material.getMaterial(furnace.getInt("config.smelts."+key+".ingredientID"));
 				short metaIngredient = (short) furnace.getInt("config.smelts."+key+".ingredient_MetaData");
-				
+
 				if(furnace.get("config.smelts."+key+".override") == null)
 				{
 					furnace.set("config.smelts."+key+".override", false);
 				}
-				
+
 				FurnaceRecipe recipe = new FurnaceRecipe(new ItemStack(material, 1, metaResult), ingredient, metaIngredient);
-				
-				if(furnace.getBoolean("config.smelts."+key+".override"))
-				{
-					plugin.overidenSmelts.put(recipe.getResult(), recipe.getInput());
-				}				
-				
+
 				plugin.getServer().addRecipe(recipe);
-				
+
 				System.out.println("[UnlimitedRecipes] Furnace Recipe for: "+material.name()+" added !");
 			}
-			
+
 			System.out.println("[UnlimitedRecipes] All smelt recipes loaded !");
 		}
-	}
-
-	public void setCraftingDefaultConfig()
-	{
-		crafting.options().header("You can get all minecraft IDs on this page: http://www.minecraftinfo.com/IDList.htm");
-		
-		crafting.set("config.crafts.ice.itemID", 79);
-		crafting.set("config.crafts.ice.metadata", 0);
-		crafting.set("config.crafts.ice.quantity", 2);
-		List<String> list = new ArrayList<String>();
-		list.add("aaa");
-		list.add("aba");
-		list.add("aaa");
-		crafting.set("config.crafts.ice.recipe", list);
-		crafting.set("config.crafts.ice.override", false);
-		crafting.set("config.crafts.ice.ingredientsID.a", "80:0");
-		crafting.set("config.crafts.ice.ingredientsID.b", "326:0");
-		
-		
-		crafting.set("config.crafts.saddle.itemID", 329);
-		crafting.set("config.crafts.saddle.metadata", 0);
-		crafting.set("config.crafts.saddle.quantity", 1);
-		List<String> list2 = new ArrayList<String>();
-		list2.add("aba");
-		list2.add("aca");
-		list2.add("aca");
-		crafting.set("config.crafts.saddle.recipe", list2);
-		crafting.set("config.crafts.saddle.override", false);
-		crafting.set("config.crafts.saddle.ingredientsID.a", "334:0");
-		crafting.set("config.crafts.saddle.ingredientsID.b", "287:0");
-		crafting.set("config.crafts.saddle.ingredientsID.c", "265:0");
-	}
-
-	public void setFurnaceDefaultConfig()
-	{
-		furnace.options().header("You can get all minecraft IDs on this page: http://www.minecraftinfo.com/IDList.htm");
-		furnace.set("config.smelts.netherrack.resultID", 87);
-		furnace.set("config.smelts.netherrack.result_MetaData", 0);
-
-		furnace.set("config.smelts.netherrack.ingredientID", 1);
-		furnace.set("config.smelts.netherrack.ingredient_MetaData", 0);
-		furnace.set("config.smelts.netherrack.override", false);
 	}
 
 	public void saveCraftingConfig()
@@ -214,6 +180,42 @@ public class Config {
 			furnace.save(new File(plugin.getDataFolder(), "furnace.yml"));
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public void extractFile(String file)
+	{
+		InputStream is = plugin.getResource(file);
+		try {
+			OutputStream out = new FileOutputStream(new File(plugin.getDataFolder(), file));
+			try {
+				byte[] buf = new byte[8192];
+				int len;
+
+				while ( (len=is.read(buf)) >= 0 ) {
+					out.write(buf, 0, len);
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} finally {
+				try {
+					out.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 

@@ -2,29 +2,38 @@ package fr.tomcraft.unlimitedrecipes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
+import net.milkbowl.vault.permission.Permission;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.inventory.FurnaceRecipe;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin{
 
 	public Config config;
-	public ArrayList<Recipe> customCrafts;
-	public ArrayList<ItemStack> overidenCrafts;
-	public ArrayList<FurnaceRecipe> customSmelts;
-	public HashMap<ItemStack, ItemStack> overidenSmelts;
+	public ArrayList<Map<Character,ItemStack>> customCrafts;
+	public HashMap<String, ShapedRecipe> overidenCrafts;
+	private Permission permission;
 
 	public void onEnable(){
-		overidenCrafts = new ArrayList<ItemStack>();
-		overidenSmelts = new HashMap<ItemStack, ItemStack>();
+		
+		this.getResource("crafting.yml");
+		
+		customCrafts = new ArrayList<Map<Character,ItemStack>>();
+		overidenCrafts = new HashMap<String, ShapedRecipe>();
 		config = new Config(this);
 		config.loadConfigs();
+		setupPermissions();
+		this.getServer().getPluginManager().registerEvents(new RecipesListener(this), this);
 	}
 
 	public FileConfiguration getCraftingConfig()
@@ -39,7 +48,7 @@ public class Main extends JavaPlugin{
 
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
 	{
-		if(sender.isOp() || sender.hasPermission("ur.reload")){
+		if(hasPermission(sender, "ur.reload")){
 
 			if(label.equalsIgnoreCase("ur"))
 			{
@@ -58,5 +67,24 @@ public class Main extends JavaPlugin{
 			}
 		}
 		return true;
+	}
+
+	public boolean hasPermission(CommandSender player, String permission)
+	{
+		return ((this.permission != null && this.permission.has(player, permission)) || player.isOp());
+	}
+
+	public boolean hasPermission(String player, String permission)
+	{
+		return ((this.permission != null && this.permission.has(getServer().getPlayer(player), permission)) || getServer().getPlayer(player).isOp());
+	}
+
+	private boolean setupPermissions()
+	{
+		RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+		if (permissionProvider != null) {
+			permission = permissionProvider.getProvider();
+		}
+		return (permission != null);
 	}
 }
