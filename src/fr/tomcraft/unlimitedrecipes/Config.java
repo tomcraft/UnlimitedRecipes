@@ -15,7 +15,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.SkullMeta;
 
 public class Config {
@@ -33,19 +35,24 @@ public class Config {
 		this.defaultConfig = plugin.getConfig();
 		File crafting = new File(plugin.getDataFolder(), "crafting.yml");
 		File furnace = new File(plugin.getDataFolder(), "furnace.yml");
+		
+		if(!plugin.getDataFolder().exists())
+		{
+			plugin.getDataFolder().mkdirs();
+		}
+		
 		if(!crafting.exists())
 		{
 			this.extractFile("crafting.yml");
-
 		}
-		
+
 		this.crafting = YamlConfiguration.loadConfiguration(crafting);
 
 		if(!furnace.exists())
 		{
 			this.extractFile("furnace.yml");
 		}
-		
+
 		this.furnace = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "furnace.yml"));
 	}
 
@@ -75,39 +82,61 @@ public class Config {
 				Object metad = crafting.get("config.crafts."+key+".metadata");
 				short metadata = 0;
 				int quantity = crafting.getInt("config.crafts."+key+".quantity");
-				ArrayList<String> recipe = (ArrayList<String>) crafting.getStringList("config.crafts."+key+".recipe");
+
+				boolean shapelessRecipe = crafting.getBoolean("config.crafts."+key+".shapelessRecipe");
 				
+				boolean override = crafting.getBoolean("config.crafts."+key+".override");
+				
+				String permission = "ur.craft." + key;
+				
+				boolean usePermission = crafting.getBoolean("config.crafts."+key+".usePermission");
+
+
+
 				ItemStack shpedre;
-				
+
 				if(metad instanceof String && (toCraft == Material.SKULL || toCraft == Material.SKULL_ITEM))
 				{
-					System.out.println(metad);
 					shpedre = new ItemStack(toCraft, quantity, (short) 3);
 					SkullMeta meta = (SkullMeta)shpedre.getItemMeta();
 					meta.setOwner(String.valueOf(metad));
 					shpedre.setItemMeta(meta);
+					metadata = 3;
 				}
 				else
 				{
 					metadata = (short)crafting.getInt("config.crafts."+key+".metadata");
 					shpedre = new ItemStack(toCraft, quantity, metadata);
 				}
+
+				Recipe recipes = new ShapedRecipe(shpedre);
 				
-				ShapedRecipe recipes = new ShapedRecipe(shpedre);
-
-				if(crafting.getBoolean("config.crafts."+key+".override"))
+				CustomRecipe custRecipe = new CustomShapedRecipe();
+				
+				if(shapelessRecipe)
 				{
-					plugin.overidenCrafts.put(recipes.getResult().getTypeId()+":"+recipes.getResult().getDurability(), recipes);
+					recipes = new ShapelessRecipe(shpedre);
+					custRecipe = new CustomShapelessRecipe();
 				}
+				
+				custRecipe.plugin = plugin;
+				custRecipe.usePermission = usePermission;
+				custRecipe.permission = permission;
+				custRecipe.override = override;
 
-				String[] shape = new String[recipe.size()];
 
-				for(int i = 0; i < shape.length; i++)
+				if(!shapelessRecipe)
 				{
-					shape[i] = recipe.get(i);
-				}
+					ArrayList<String> recipe = (ArrayList<String>) crafting.getStringList("config.crafts."+key+".recipe");
+					String[] shape = new String[recipe.size()];
 
-				recipes.shape(shape);
+					for(int i = 0; i < shape.length; i++)
+					{
+						shape[i] = recipe.get(i);
+					}
+
+					((ShapedRecipe)recipes).shape(shape);
+				}
 
 				Set<String> keys2 = crafting.getConfigurationSection("config.crafts."+key+".ingredientsID").getKeys(false);
 				for(String key2 : keys2){
@@ -140,11 +169,24 @@ public class Config {
 					}
 
 					try{
-						recipes.setIngredient(c, new ItemStack(material, quantityIng, meta).getData());
+						if(!shapelessRecipe)
+						{
+							((ShapedRecipe)recipes).setIngredient(c, new ItemStack(material, quantityIng, meta).getData());
+						}
+						else
+						{
+							((ShapelessRecipe)recipes).addIngredient(new ItemStack(material, quantityIng, meta).getData());
+						}
+
 					}catch(Exception e){}
 				}
-				plugin.customCrafts.add(recipes.getIngredientMap());
-				plugin.getServer().addRecipe(recipes);
+
+				custRecipe.recipe = recipes;
+				if(custRecipe instanceof CustomShapedRecipe){
+					((CustomShapedRecipe)custRecipe).ingredients = ((ShapedRecipe)recipes).getIngredientMap();
+					plugin.customShapedCrafts.add(((CustomShapedRecipe)custRecipe).ingredients);
+				}
+				custRecipe.register();
 				System.out.println("[UnlimitedRecipes] Crafting Recipe for: "+toCraft.name()+":"+metadata+" added !");
 			}
 			System.out.println("[UnlimitedRecipes] All craft recipes loaded !");

@@ -6,10 +6,12 @@ config:
       itemID: 79
       metadata: 0
       quantity: 2
+      shapelessRecipe: false
       recipe:
       - 'aaa'
       - 'aba'
       - 'aaa'
+      usePermission: false
       override: false
       ingredientsID:
         a: '80:0x1'
@@ -20,10 +22,12 @@ config:
       itemID: 48
       metadata: 0
       quantity: 1
+      shapelessRecipe: false
       recipe:
       - 'aaa'
       - 'aba'
       - 'aaa'
+      usePermission: false
       override: false
       ingredientsID:
         a: '106:0x1'
@@ -34,10 +38,12 @@ config:
       itemID: 98
       metadata: 1
       quantity: 1
+      shapelessRecipe: false
       recipe:
       - 'aaa'
       - 'aba'
       - 'aaa'
+      usePermission: false
       override: false
       ingredientsID:
         a: '106:0x1'
@@ -48,10 +54,12 @@ config:
       itemID: 98
       metadata: 1
       quantity: 1
+      shapelessRecipe: false
       recipe:
       - 'aaa'
       - 'aba'
       - 'aaa'
+      usePermission: false
       override: false
       ingredientsID:
         a: '106:0x1'
@@ -62,10 +70,12 @@ config:
       itemID: 98
       metadata: 2
       quantity: 9
+      shapelessRecipe: false
       recipe:
       - 'aaa'
       - 'aaa'
       - 'aaa'
+      usePermission: false
       override: false
       ingredientsID:
         a: '98:0x1'
@@ -75,9 +85,11 @@ config:
       itemID: 98
       metadata: 3
       quantity: 4
+      shapelessRecipe: false
       recipe:
       - 'aa'
       - 'aa'
+      usePermission: false
       override: false
       ingredientsID:
         a: '44:5'
@@ -87,10 +99,12 @@ config:
       itemID: 16
       metadata: 0
       quantity: 1
+      shapelessRecipe: false
       recipe:
       - 'aaa'
       - 'aba'
       - 'aaa'
+      usePermission: false
       override: false
       ingredientsID:
         a: '263:0x1'
@@ -101,10 +115,12 @@ config:
       itemID: 56
       metadata: 0
       quantity: 1
+      shapelessRecipe: false
       recipe:
       - 'bab'
       - 'ada'
       - 'cac'
+      usePermission: false
       override: false
       ingredientsID:
         a: '33:0x1'
@@ -117,10 +133,12 @@ config:
       itemID: 46
       metadata: 0
       quantity: 2
+      shapelessRecipe: false
       recipe:
       - 'aba'
       - 'bab'
       - 'aba'
+      usePermission: false
       override: false
       ingredientsID:
         a: '289:0x1'
@@ -131,9 +149,11 @@ config:
       itemID: 302
       metadata: 0
       quantity: 1
+      shapelessRecipe: false
       recipe:
       - 'aaa'
       - 'a a'
+      usePermission: false
       override: false
       ingredientsID:
         a: '101:0x1'
@@ -143,10 +163,12 @@ config:
       itemID: 303
       metadata: 0
       quantity: 1
+      shapelessRecipe: false
       recipe:
       - 'a a'
       - 'aaa'
       - 'aaa'
+      usePermission: false
       override: false
       ingredientsID:
         a: '101:0x1'
@@ -156,10 +178,12 @@ config:
       itemID: 304
       metadata: 0
       quantity: 1
+      shapelessRecipe: false
       recipe:
       - 'aaa'
       - 'a a'
       - 'a a'
+      usePermission: false
       override: false
       ingredientsID:
         a: '101:0x1'
@@ -169,9 +193,23 @@ config:
       itemID: 305
       metadata: 0
       quantity: 1
+      shapelessRecipe: false
       recipe:
       - 'a a'
       - 'a a'
+      usePermission: false
       override: false
       ingredientsID:
         a: '101:0x1'
+        
+        # iron bars = chain boots
+    testshapeless:
+      itemID: 397
+      metadata: 'Xx_tomcraft_xX'
+      quantity: 1
+      shapelessRecipe: true
+      usePermission: false
+      override: false
+      ingredientsID:
+        1: '1:0x1'
+        2: '5:0x3'
