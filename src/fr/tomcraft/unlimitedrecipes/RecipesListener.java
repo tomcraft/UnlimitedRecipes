@@ -44,10 +44,8 @@ public class RecipesListener implements Listener{
 			}
 			else
 			{
-				System.out.println(plugin.getCustomRecipeByRecipe(recipe).permission);
 				if(plugin.getCustomRecipeByRecipe(recipe).usePermission && !plugin.hasPermission(e.getView().getPlayer().getName(), plugin.getCustomRecipeByRecipe(recipe).permission))
 				{
-					System.out.println("2");
 					e.getInventory().setResult(null);
 					return;
 				}
@@ -67,10 +65,8 @@ public class RecipesListener implements Listener{
 		else if(e.getRecipe() instanceof ShapelessRecipe)
 		{
 			ShapelessRecipe recipe = ((ShapelessRecipe)e.getRecipe());
-			System.out.println("3");
 			if(!plugin.isCustomRecipe(recipe))
 			{
-				System.out.println("2");
 				if(plugin.getCustomRecipeByResult(recipe.getResult().getTypeId()+":"+recipe.getResult().getDurability()) != null)
 				{
 					ItemStack result = recipe.getResult();
@@ -89,7 +85,6 @@ public class RecipesListener implements Listener{
 			{
 				if(plugin.getCustomRecipeByRecipe(recipe).usePermission && !plugin.hasPermission(e.getView().getPlayer().getName(), plugin.getCustomRecipeByRecipe(recipe).permission))
 				{
-					System.out.println("2");
 					e.getInventory().setResult(null);
 					return;
 				}
@@ -106,5 +101,4 @@ public class RecipesListener implements Listener{
 			}
 		}
 	}
-	
 }

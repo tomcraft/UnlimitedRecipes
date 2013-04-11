@@ -171,11 +171,11 @@ public class Config {
 					try{
 						if(!shapelessRecipe)
 						{
-							((ShapedRecipe)recipes).setIngredient(c, new ItemStack(material, quantityIng, meta).getData());
+							((ShapedRecipe)recipes).setIngredient(c, new ItemStack(material, meta).getData().toItemStack(quantityIng).getData());
 						}
 						else
 						{
-							((ShapelessRecipe)recipes).addIngredient(new ItemStack(material, quantityIng, meta).getData());
+							((ShapelessRecipe)recipes).addIngredient(new ItemStack(material, meta).getData().toItemStack(quantityIng).getData());
 						}
 
 					}catch(Exception e){}

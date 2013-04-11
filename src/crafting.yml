@@ -14,8 +14,8 @@ config:
       usePermission: false
       override: false
       ingredientsID:
-        a: '80:0x1'
-        b: '326:0x1'
+        a: '80:0'
+        b: '326:0'
 
     # vines + cobblestone = moss stone 
     mossstone01:
@@ -30,8 +30,8 @@ config:
       usePermission: false
       override: false
       ingredientsID:
-        a: '106:0x1'
-        b: '4:0x1'
+        a: '106:0'
+        b: '4:0'
 
     # vines + stone bricks = mossy stone bricks
     mossbricks01:
@@ -46,8 +46,8 @@ config:
       usePermission: false
       override: false
       ingredientsID:
-        a: '106:0x1'
-        b: '98:0x1'
+        a: '106:0'
+        b: '98:0'
 
     # tall grass + stone bricks = mossy stone bricks
     mossbricks02:
@@ -62,8 +62,8 @@ config:
       usePermission: false
       override: false
       ingredientsID:
-        a: '106:0x1'
-        b: '31:1x1'
+        a: '106:0'
+        b: '31:1'
 
     # stone bricks = cracked stone bricks
     crackedbricks:
@@ -78,7 +78,7 @@ config:
       usePermission: false
       override: false
       ingredientsID:
-        a: '98:0x1'
+        a: '98:0'
 
     # stone brick slab = chiseled stone bricks
     chiseledbricks:
@@ -107,8 +107,8 @@ config:
       usePermission: false
       override: false
       ingredientsID:
-        a: '263:0x1'
-        b: '1:0x1'
+        a: '263:0'
+        b: '1:0'
 
     # piston + redstone torch + lava + coal ore = diamond ore
     diamond:
@@ -123,10 +123,10 @@ config:
       usePermission: false
       override: false
       ingredientsID:
-        a: '33:0x1'
-        b: '76:0x1'
-        c: '327:0x1'
-        d: '16:0x1'
+        a: '33:0'
+        b: '76:0'
+        c: '327:0'
+        d: '16:0'
 
     # gunpowder + end stone = 2x TNT
     dynamite01:
@@ -141,8 +141,8 @@ config:
       usePermission: false
       override: false
       ingredientsID:
-        a: '289:0x1'
-        b: '121:0x1'
+        a: '289:0'
+        b: '121:0'
 
     # iron bars = chain helmet
     chainhelmet:
@@ -156,7 +156,7 @@ config:
       usePermission: false
       override: false
       ingredientsID:
-        a: '101:0x1'
+        a: '101:0'
 
     # iron bars = chain chestplate
     chainchestplate:
@@ -171,7 +171,7 @@ config:
       usePermission: false
       override: false
       ingredientsID:
-        a: '101:0x1'
+        a: '101:0'
 
     # iron bars = chain leggings
     chainleggings:
@@ -186,7 +186,7 @@ config:
       usePermission: false
       override: false
       ingredientsID:
-        a: '101:0x1'
+        a: '101:0'
 
     # iron bars = chain boots
     chainboots:
@@ -200,16 +200,20 @@ config:
       usePermission: false
       override: false
       ingredientsID:
-        a: '101:0x1'
+        a: '101:0'
         
-        # iron bars = chain boots
-    testshapeless:
+    # os + endereye = the crafter's head
+    ownHead:
       itemID: 397
-      metadata: 'Xx_tomcraft_xX'
+      metadata: '--CrafterHead'
       quantity: 1
-      shapelessRecipe: true
+      shapelessRecipe: false
+      recipe:
+      - 'aaa'
+      - 'bab'
+      - 'aaa'
       usePermission: false
       override: false
       ingredientsID:
-        1: '1:0x1'
-        2: '5:0x3'
+        a: '352:0'
+        b: '381:0x2'
