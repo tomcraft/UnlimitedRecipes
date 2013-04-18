@@ -27,7 +27,6 @@ public class RecipesListener implements Listener{
 
 			if(!plugin.isCustomRecipe(recipe))
 			{
-				System.out.println("noCustShaped");
 				if(plugin.getCustomRecipeByResult(recipe.getResult().getTypeId()+":"+recipe.getResult().getDurability()) != null && plugin.getCustomRecipeByResult(recipe.getResult().getTypeId()+":"+recipe.getResult().getDurability()).override)
 				{
 					ItemStack result = recipe.getResult();

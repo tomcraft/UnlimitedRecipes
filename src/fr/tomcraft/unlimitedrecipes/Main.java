@@ -21,20 +21,12 @@ public class Main extends JavaPlugin{
 
 	public Config config;
 	public ArrayList<CustomRecipe> customRecipes;
-	//public HashMap<List<ItemStack>, String> permissionsCrafts;
-	//public HashMap<Map<Character, ItemStack>, String> permissionsCrafts2;
 	public ArrayList<Map<Character,ItemStack>> customShapedCrafts;
-	//public HashMap<String, Recipe> overidenCrafts;
 	private Permission permission;
-	//public ArrayList<List<ItemStack>> customShapelessCrafts;
 
 	public void onEnable(){
 		customRecipes = new ArrayList<CustomRecipe>();
 		customShapedCrafts = new ArrayList<Map<Character,ItemStack>>();
-		//customShapelessCrafts = new ArrayList<List<ItemStack>>();*/
-		//overidenCrafts = new HashMap<String, Recipe>();
-		/*permissionsCrafts = new HashMap<List<ItemStack>, String>();
-		permissionsCrafts2 = new HashMap<Map<Character,ItemStack>, String>();*/
 		config = new Config(this);
 		config.loadConfigs();
 		setupPermissions();
