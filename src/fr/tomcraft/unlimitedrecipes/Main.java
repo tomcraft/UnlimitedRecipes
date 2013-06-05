@@ -136,19 +136,4 @@ public class Main extends JavaPlugin{
 		return false;
 	}
 	
-	public boolean compareTabs(String[] tab1, String[] tab2)
-	{
-		for(String str : tab1)
-		{
-			for(String str2 : tab2)
-			{
-				System.out.println(str + ":"+str2);
-				if(str.equalsIgnoreCase(str2))
-				{
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 }

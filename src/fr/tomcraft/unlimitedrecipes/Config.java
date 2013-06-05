@@ -20,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 public class Config {
@@ -94,6 +95,8 @@ public class Config {
 				String permission = "ur.craft." + key;
 
 				boolean usePermission = crafting.getBoolean("config.crafts."+key+".usePermission");
+				
+				String customName = crafting.getString("config.crafts."+key+".customName");
 
 				ItemStack shpedre;
 
@@ -118,6 +121,13 @@ public class Config {
 						}
 					}
 
+				}
+				
+				if(customName != null)
+				{
+					ItemMeta tmp = shpedre.getItemMeta();
+					tmp.setDisplayName(customName.replaceAll("(&([a-f0-9]))", "§$2"));
+					shpedre.setItemMeta(tmp);
 				}
 
 				Recipe recipes = new ShapedRecipe(shpedre);
@@ -154,14 +164,14 @@ public class Config {
 					ConfigurationSection section2 = crafting.getConfigurationSection("config.crafts."+key+".ingredientsID");
 					char c = key2.charAt(0);
 					short meta = 0;
-					int quantityIng = 1;
+					short quantityIng = 1;
 					Material material;
 
 					if(section2.getString(key2).contains(":") && section2.getString(key2).contains("x"))
 					{
 						meta = Short.parseShort(section2.getString(key2).split(":")[1].split("x")[0]);
 						material = Material.getMaterial(Integer.parseInt(section2.getString(key2).split(":")[0]));
-						quantityIng = Integer.parseInt(section2.getString(key2).split("x")[1]);
+						quantityIng = Short.parseShort(section2.getString(key2).split("x")[1]);
 					}
 					else if(section2.getString(key2).contains(":"))
 					{
@@ -172,7 +182,7 @@ public class Config {
 					{
 						meta = Short.parseShort(section2.getString(key2).split("x")[0]);
 						material = Material.getMaterial(Integer.parseInt(section2.getString(key2).split(":")[0]));
-						quantityIng = Integer.parseInt(section2.getString(key2).split("x")[1]);
+						quantityIng = Short.parseShort(section2.getString(key2).split("x")[1]);
 					}
 					else
 					{
@@ -182,11 +192,11 @@ public class Config {
 					try{
 						if(!shapelessRecipe)
 						{
-							((ShapedRecipe)recipes).setIngredient(c, new ItemStack(material, meta).getData().toItemStack(quantityIng).getData());
+							((ShapedRecipe)recipes).setIngredient(c, new ItemStack(material, meta, quantityIng).getData());
 						}
 						else
 						{
-							((ShapelessRecipe)recipes).addIngredient(new ItemStack(material, meta).getData().toItemStack(quantityIng).getData());
+							((ShapelessRecipe)recipes).addIngredient(new ItemStack(material, meta, quantityIng).getData());
 						}
 
 					}catch(Exception e){}
