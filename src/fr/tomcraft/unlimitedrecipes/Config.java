@@ -7,12 +7,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -35,12 +37,12 @@ public class Config {
 		this.defaultConfig = plugin.getConfig();
 		File crafting = new File(plugin.getDataFolder(), "crafting.yml");
 		File furnace = new File(plugin.getDataFolder(), "furnace.yml");
-		
+
 		if(!plugin.getDataFolder().exists())
 		{
 			plugin.getDataFolder().mkdirs();
 		}
-		
+
 		if(!crafting.exists())
 		{
 			this.extractFile("crafting.yml");
@@ -83,15 +85,15 @@ public class Config {
 				short metadata = 0;
 				int quantity = crafting.getInt("config.crafts."+key+".quantity");
 
+				List<String> enchants = crafting.getStringList("config.crafts."+key+".enchantments");
+
 				boolean shapelessRecipe = crafting.getBoolean("config.crafts."+key+".shapelessRecipe");
-				
+
 				boolean override = crafting.getBoolean("config.crafts."+key+".override");
-				
+
 				String permission = "ur.craft." + key;
-				
+
 				boolean usePermission = crafting.getBoolean("config.crafts."+key+".usePermission");
-
-
 
 				ItemStack shpedre;
 
@@ -107,18 +109,27 @@ public class Config {
 				{
 					metadata = (short)crafting.getInt("config.crafts."+key+".metadata");
 					shpedre = new ItemStack(toCraft, quantity, metadata);
+					if(enchants != null && !enchants.isEmpty()){
+						for(String str : enchants)
+						{
+							try{
+								shpedre.addEnchantment(Enchantment.getById(Integer.valueOf(str.split(":")[0])) , Integer.valueOf(str.split(":")[1]));
+							}catch(Exception e){}
+						}
+					}
+
 				}
 
 				Recipe recipes = new ShapedRecipe(shpedre);
-				
+
 				CustomRecipe custRecipe = new CustomShapedRecipe();
-				
+
 				if(shapelessRecipe)
 				{
 					recipes = new ShapelessRecipe(shpedre);
 					custRecipe = new CustomShapelessRecipe();
 				}
-				
+
 				custRecipe.plugin = plugin;
 				custRecipe.usePermission = usePermission;
 				custRecipe.permission = permission;
@@ -206,11 +217,6 @@ public class Config {
 
 				Material ingredient = Material.getMaterial(furnace.getInt("config.smelts."+key+".ingredientID"));
 				short metaIngredient = (short) furnace.getInt("config.smelts."+key+".ingredient_MetaData");
-
-				if(furnace.get("config.smelts."+key+".override") == null)
-				{
-					furnace.set("config.smelts."+key+".override", false);
-				}
 
 				FurnaceRecipe recipe = new FurnaceRecipe(new ItemStack(material, 1, metaResult), ingredient, metaIngredient);
 
