@@ -217,4 +217,4 @@ config:
       override: false
       ingredientsID:
         a: '352:0'
-        b: '381:0x2'
+        b: '381:0'
