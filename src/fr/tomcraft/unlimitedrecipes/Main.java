@@ -19,12 +19,45 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin{
 
+	public static String PACKAGE_NAME_SERVER;
+	public static String PACKAGE_NAME_CRAFTBUKKIT;
 	public Config config;
 	public ArrayList<CustomRecipe> customRecipes;
 	public ArrayList<Map<Character,ItemStack>> customShapedCrafts;
 	private Permission permission;
 
 	public void onEnable(){
+		
+		try{
+			Package[] a = Package.getPackages();
+			Package pl = null;
+			for(Package p : a)
+			{
+				if(p.getName().startsWith("net.minecraft.server"))
+				{
+					try{
+						Class.forName(p.getName()+".Block");
+						pl = p;
+						Main.PACKAGE_NAME_SERVER = p.getName();
+						System.out.println(p.getName());
+					}catch(Exception e){}
+				}
+				else if(p.getName().startsWith("org.bukkit.craftbukkit"))
+				{
+					try{
+						Class.forName(p.getName()+".CraftServer");
+						pl = p;
+						Main.PACKAGE_NAME_CRAFTBUKKIT = p.getName();
+						System.out.println(p.getName());
+					}catch(Exception e){}
+				}
+					
+			}
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
 		customRecipes = new ArrayList<CustomRecipe>();
 		customShapedCrafts = new ArrayList<Map<Character,ItemStack>>();
 		config = new Config(this);

@@ -6,10 +6,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -95,7 +98,7 @@ public class Config {
 				String permission = "ur.craft." + key;
 
 				boolean usePermission = crafting.getBoolean("config.crafts."+key+".usePermission");
-				
+
 				String customName = crafting.getString("config.crafts."+key+".customName");
 
 				ItemStack shpedre;
@@ -122,11 +125,11 @@ public class Config {
 					}
 
 				}
-				
+
 				if(customName != null)
 				{
 					ItemMeta tmp = shpedre.getItemMeta();
-					tmp.setDisplayName(customName.replaceAll("(&([a-f0-9]))", "§$2"));
+					tmp.setDisplayName(ChatColor.RESET + customName.replaceAll("(&([a-f0-9]))", "§$2"));
 					shpedre.setItemMeta(tmp);
 				}
 
@@ -164,7 +167,7 @@ public class Config {
 					ConfigurationSection section2 = crafting.getConfigurationSection("config.crafts."+key+".ingredientsID");
 					char c = key2.charAt(0);
 					short meta = 0;
-					short quantityIng = 1;
+					int quantityIng = 1;
 					Material material;
 
 					if(section2.getString(key2).contains(":") && section2.getString(key2).contains("x"))
@@ -182,7 +185,7 @@ public class Config {
 					{
 						meta = Short.parseShort(section2.getString(key2).split("x")[0]);
 						material = Material.getMaterial(Integer.parseInt(section2.getString(key2).split(":")[0]));
-						quantityIng = Short.parseShort(section2.getString(key2).split("x")[1]);
+						quantityIng = Integer.parseInt(section2.getString(key2).split("x")[1]);
 					}
 					else
 					{
@@ -192,14 +195,16 @@ public class Config {
 					try{
 						if(!shapelessRecipe)
 						{
-							((ShapedRecipe)recipes).setIngredient(c, new ItemStack(material, meta, quantityIng).getData());
+							((ShapedRecipe)recipes).setIngredient(c, material, meta);
 						}
 						else
 						{
-							((ShapelessRecipe)recipes).addIngredient(new ItemStack(material, meta, quantityIng).getData());
+							((ShapelessRecipe)recipes).addIngredient(quantityIng, material, meta);
 						}
 
-					}catch(Exception e){}
+					}catch(Exception e){
+						System.out.println("ERREUR DURRING ADDING RECIPE FOR: "+toCraft.name()+":"+metadata);
+					}
 				}
 
 				custRecipe.recipe = recipes;

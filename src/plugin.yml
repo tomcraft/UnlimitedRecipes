@@ -1,7 +1,7 @@
 name: UnlimitedRecipes
 main: fr.tomcraft.unlimitedrecipes.Main
 author: Xx_tomcraft_xX
-version: 1.6
+version: 1.7
 depend: [Vault]
 commands:
     ur:

@@ -6,6 +6,7 @@ config:
       itemID: 79
       metadata: 0
       quantity: 2
+      customName: '&2Crafted &1Item &3CustomName'
       shapelessRecipe: false
       recipe:
       - 'aaa'

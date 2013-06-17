@@ -1,0 +1,9 @@
+# You can get all minecraft IDs on this page: http://www.minecraftinfo.com/IDList.htm
+config:
+  smelts:
+    netherrack:
+      resultID: 87
+      result_MetaData: 0
+      ingredientID: 1
+      ingredient_MetaData: 0
+      override: false
