@@ -1,4 +1,5 @@
 # You can get all minecraft IDs on this page: http://www.minecraftinfo.com/IDList.htm
+# You can get all enchants IDs on this page: http://fr.minecraftwiki.net/wiki/Enchantement
 config:
   crafts:
     # water + snow = ice
@@ -171,6 +172,9 @@ config:
       - 'aaa'
       usePermission: false
       override: false
+      enchantments:
+      - '0:4'
+      - '7:3'
       ingredientsID:
         a: '101:0'
 

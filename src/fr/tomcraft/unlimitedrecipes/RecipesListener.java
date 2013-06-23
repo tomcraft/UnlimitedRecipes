@@ -1,9 +1,11 @@
 package fr.tomcraft.unlimitedrecipes;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
@@ -15,6 +17,16 @@ public class RecipesListener implements Listener{
 
 	public RecipesListener(Main plugin) {
 		this.plugin = plugin;
+	}
+	
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent e)
+	{
+		if(Updater.updateAvailable && plugin.hasPermission(e.getPlayer(), "ur.version"))
+		{
+			e.getPlayer().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + "[UnlimitedRecipes] " + ChatColor.RESET + ChatColor.RED + "An update is available, you can get it here: ");
+			e.getPlayer().sendMessage(ChatColor.RED+"http://dev.bukkit.org/bukkit-plugins/unlimitedrecipes/");
+		}
 	}
 
 	@EventHandler
@@ -35,7 +47,6 @@ public class RecipesListener implements Listener{
 					if(result.getType() == custom.getType() && result.getDurability() == custom.getDurability() && !((ShapedRecipe)plugin.getCustomRecipeByResult(recipe.getResult().getTypeId()+":"+recipe.getResult().getDurability()).recipe).getShape().equals(recipe.getShape()))
 					{
 						e.getInventory().setResult(null);
-						//e.getInventory().remove(e.getRecipe().getResult());
 					}
 
 				}
@@ -54,7 +65,6 @@ public class RecipesListener implements Listener{
 					SkullMeta meta = ((SkullMeta)result.getItemMeta());
 					meta.setOwner(e.getView().getPlayer().getName());
 					result.setItemMeta(meta);
-					//e.getInventory().remove(recipe.getResult());
 					e.getInventory().setResult(result);
 				}
 			}
@@ -74,7 +84,6 @@ public class RecipesListener implements Listener{
 					if(result.getType() == custom.getType() && result.getDurability() == custom.getDurability() && ((ShapelessRecipe)plugin.getCustomRecipeByResult(recipe.getResult().getTypeId()+":"+recipe.getResult().getDurability()).recipe).getIngredientList() != recipe.getIngredientList())
 					{
 						e.getInventory().setResult(null);
-						//e.getInventory().remove(e.getRecipe().getResult());
 					}
 
 				}
@@ -93,7 +102,6 @@ public class RecipesListener implements Listener{
 					SkullMeta meta = ((SkullMeta)result.getItemMeta());
 					meta.setOwner(e.getView().getPlayer().getName());
 					result.setItemMeta(meta);
-					//e.getInventory().remove(recipe.getResult());
 					e.getInventory().setResult(result);
 				}
 			}

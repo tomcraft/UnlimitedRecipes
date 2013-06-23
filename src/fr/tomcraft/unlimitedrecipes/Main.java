@@ -2,6 +2,7 @@ package fr.tomcraft.unlimitedrecipes;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Random;
 
 import net.milkbowl.vault.permission.Permission;
 
@@ -27,8 +28,9 @@ public class Main extends JavaPlugin{
 	private Permission permission;
 
 	public void onEnable(){
-		
 		try{
+			Updater.start();
+			
 			Package[] a = Package.getPackages();
 			Package pl = null;
 			for(Package p : a)
@@ -39,7 +41,6 @@ public class Main extends JavaPlugin{
 						Class.forName(p.getName()+".Block");
 						pl = p;
 						Main.PACKAGE_NAME_SERVER = p.getName();
-						System.out.println(p.getName());
 					}catch(Exception e){}
 				}
 				else if(p.getName().startsWith("org.bukkit.craftbukkit"))
@@ -48,7 +49,6 @@ public class Main extends JavaPlugin{
 						Class.forName(p.getName()+".CraftServer");
 						pl = p;
 						Main.PACKAGE_NAME_CRAFTBUKKIT = p.getName();
-						System.out.println(p.getName());
 					}catch(Exception e){}
 				}
 					
