@@ -3,6 +3,7 @@ package fr.tomcraft.unlimitedrecipes;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -19,13 +20,13 @@ public class RecipesListener implements Listener{
 		this.plugin = plugin;
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerJoin(PlayerJoinEvent e)
 	{
-		if(Updater.updateAvailable && plugin.hasPermission(e.getPlayer(), "ur.version"))
+		if(Updater.updateAvailable && plugin.hasPermission(e.getPlayer(), "ur.update"))
 		{
-			e.getPlayer().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + "[UnlimitedRecipes] " + ChatColor.RESET + ChatColor.RED + "An update is available, you can get it here: ");
-			e.getPlayer().sendMessage(ChatColor.RED+"http://dev.bukkit.org/bukkit-plugins/unlimitedrecipes/");
+			e.getPlayer().sendMessage(ChatColor.RED + "[UnlimitedRecipes] An update is available, you can get it here:");
+			e.getPlayer().sendMessage(ChatColor.RED+"http://dev.bukkit.org/bukkit-plugins/unlimitedrecipes/ (click)");
 		}
 	}
 
