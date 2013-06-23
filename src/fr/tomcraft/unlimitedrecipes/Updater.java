@@ -6,6 +6,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitTask;
 
 public class Updater implements Runnable{
@@ -34,6 +35,8 @@ public class Updater implements Runnable{
 			BufferedReader br = new BufferedReader(new InputStreamReader(yc.getInputStream()));
 			if(br.readLine() != version)
 			{
+				Bukkit.getConsoleSender().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + "[UnlimitedRecipes] " + ChatColor.RESET + ChatColor.RED + "An update is available, you can get it here: ");
+				Bukkit.getConsoleSender().sendMessage(ChatColor.RED+"http://dev.bukkit.org/bukkit-plugins/unlimitedrecipes/");
 				return true;
 			}
 			return false;
