@@ -33,7 +33,7 @@ public class Updater implements Runnable{
 			URL url = new URL("https://dl.dropboxusercontent.com/u/66453947/Plugins/UnlimitedRecipes_version.txt");
 			URLConnection yc = url.openConnection();
 			BufferedReader br = new BufferedReader(new InputStreamReader(yc.getInputStream()));
-			if(br.readLine() != version)
+			if(!br.readLine().equalsIgnoreCase(version))
 			{
 				Bukkit.getConsoleSender().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + "[UnlimitedRecipes] " + ChatColor.RESET + ChatColor.RED + "An update is available, you can get it here: ");
 				Bukkit.getConsoleSender().sendMessage(ChatColor.RED+"http://dev.bukkit.org/bukkit-plugins/unlimitedrecipes/");

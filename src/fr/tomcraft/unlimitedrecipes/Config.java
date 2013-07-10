@@ -6,13 +6,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -24,6 +23,7 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 public class Config {
@@ -59,7 +59,7 @@ public class Config {
 			this.extractFile("furnace.yml");
 		}
 
-		this.furnace = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "furnace.yml"));
+		this.furnace = YamlConfiguration.loadConfiguration(furnace);
 	}
 
 	public void loadConfigs()
@@ -111,19 +111,26 @@ public class Config {
 					shpedre.setItemMeta(meta);
 					metadata = 3;
 				}
+				else if(metad instanceof String && (toCraft.name().contains("LEATHER_")))
+				{
+					shpedre = new ItemStack(toCraft, quantity);
+					LeatherArmorMeta meta = (LeatherArmorMeta) shpedre.getItemMeta();
+					meta.setColor(Color.fromBGR(Integer.parseInt((String) metad)));
+					shpedre.setItemMeta(meta);
+				}
 				else
 				{
 					metadata = (short)crafting.getInt("config.crafts."+key+".metadata");
 					shpedre = new ItemStack(toCraft, quantity, metadata);
-					if(enchants != null && !enchants.isEmpty()){
-						for(String str : enchants)
-						{
-							try{
-								shpedre.addEnchantment(Enchantment.getById(Integer.valueOf(str.split(":")[0])) , Integer.valueOf(str.split(":")[1]));
-							}catch(Exception e){}
-						}
+				}
+				
+				if(enchants != null && !enchants.isEmpty()){
+					for(String str : enchants)
+					{
+						try{
+							shpedre.addEnchantment(Enchantment.getById(Integer.valueOf(str.split(":")[0])) , Integer.valueOf(str.split(":")[1]));
+						}catch(Exception e){}
 					}
-
 				}
 
 				if(customName != null)
@@ -229,11 +236,22 @@ public class Config {
 
 				Material material = Material.getMaterial(furnace.getInt("config.smelts."+key+".resultID"));
 				short metaResult = (short) furnace.getInt("config.smelts."+key+".result_MetaData");
+				
+				String customName = crafting.getString("config.smelts."+key+".result_customName");
 
 				Material ingredient = Material.getMaterial(furnace.getInt("config.smelts."+key+".ingredientID"));
 				short metaIngredient = (short) furnace.getInt("config.smelts."+key+".ingredient_MetaData");
+				
+				ItemStack shpedre = new ItemStack(material, 1, metaResult);
+				
+				if(customName != null)
+				{
+					ItemMeta tmp = shpedre.getItemMeta();
+					tmp.setDisplayName(ChatColor.RESET + customName.replaceAll("(&([a-f0-9]))", "§$2"));
+					shpedre.setItemMeta(tmp);
+				}
 
-				FurnaceRecipe recipe = new FurnaceRecipe(new ItemStack(material, 1, metaResult), ingredient, metaIngredient);
+				FurnaceRecipe recipe = new FurnaceRecipe(shpedre, ingredient, metaIngredient);
 
 				plugin.getServer().addRecipe(recipe);
 
