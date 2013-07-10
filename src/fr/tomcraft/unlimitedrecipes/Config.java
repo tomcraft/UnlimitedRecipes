@@ -115,7 +115,7 @@ public class Config {
 				{
 					shpedre = new ItemStack(toCraft, quantity);
 					LeatherArmorMeta meta = (LeatherArmorMeta) shpedre.getItemMeta();
-					meta.setColor(Color.fromRGB(Integer.parseInt(((String)metad).split("r:")[1].split(";")[0]), Integer.parseInt(((String)metad).split("g:")[1].split(";")[0]), Integer.parseInt(((String)metad).split("b:")[1].split(";")[0])));
+					meta.setColor(Color.fromRGB(Integer.parseInt(((String)metad).split("r:")[1].split(";")[0].trim()), Integer.parseInt(((String)metad).split("g:")[1].split(";")[0].trim()), Integer.parseInt(((String)metad).split("b:")[1].split(";")[0].trim())));
 					shpedre.setItemMeta(meta);
 				}
 				else
