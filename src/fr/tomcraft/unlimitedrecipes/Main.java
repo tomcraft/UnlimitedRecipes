@@ -28,9 +28,7 @@ public class Main extends JavaPlugin{
 	private Permission permission;
 
 	public void onEnable(){
-		try{
-			Updater.start();
-			
+		try{		
 			Package[] a = Package.getPackages();
 			Package pl = null;
 			for(Package p : a)
@@ -62,6 +60,7 @@ public class Main extends JavaPlugin{
 		customShapedCrafts = new ArrayList<Map<Character,ItemStack>>();
 		config = new Config(this);
 		config.loadConfigs();
+		Updater.start();
 		setupPermissions();
 		this.getServer().getPluginManager().registerEvents(new RecipesListener(this), this);
 	}

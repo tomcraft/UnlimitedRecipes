@@ -29,7 +29,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 public class Config {
 
 	private Main plugin;
-
+	
 	public FileConfiguration defaultConfig;
 
 	public FileConfiguration crafting;
@@ -39,6 +39,15 @@ public class Config {
 	public Config(Main plugin){
 		this.plugin = plugin;
 		this.defaultConfig = plugin.getConfig();
+		
+		if(defaultConfig.get("enableUpdateChecking") == null)
+		{
+			defaultConfig.set("enableUpdateChecking", true);
+			plugin.saveConfig();
+		}
+		
+		Updater.updateChecking = defaultConfig.getBoolean("enableUpdateChecking");
+		
 		File crafting = new File(plugin.getDataFolder(), "crafting.yml");
 		File furnace = new File(plugin.getDataFolder(), "furnace.yml");
 

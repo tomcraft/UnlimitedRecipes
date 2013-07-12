@@ -13,13 +13,16 @@ public class Updater implements Runnable{
 
 	public static String version = Bukkit.getPluginManager().getPlugin("UnlimitedRecipes").getDescription().getVersion();
 
+	public static boolean updateChecking = true;
+	
 	public static boolean updateAvailable = false;
 
 	private static BukkitTask task;
 
 	public static void start()
 	{
-		task = Bukkit.getScheduler().runTaskTimerAsynchronously(Bukkit.getPluginManager().getPlugin("UnlimitedRecipes"), new Updater(), 0L, 864000L);
+		if(updateChecking)
+			task = Bukkit.getScheduler().runTaskTimerAsynchronously(Bukkit.getPluginManager().getPlugin("UnlimitedRecipes"), new Updater(), 0L, 864000L);
 	}
 	
 	public static void stop()
