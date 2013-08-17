@@ -9,9 +9,9 @@ public class CustomFurnaceRecipe extends CustomRecipe{
 		
 	}
 
-	public CustomFurnaceRecipe(FurnaceRecipe recipe, Main plugin,
+	public CustomFurnaceRecipe(String name, FurnaceRecipe recipe, Main plugin,
 			boolean usePermission, String permission, boolean override) {
-		super(recipe, plugin, usePermission, permission, override);
+		super(name, recipe, plugin, usePermission, permission, override);
 		// TODO Auto-generated constructor stub
 	}
 

@@ -2,7 +2,6 @@ package fr.tomcraft.unlimitedrecipes;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Random;
 
 import net.milkbowl.vault.permission.Permission;
 
@@ -28,7 +27,7 @@ public class Main extends JavaPlugin{
 	private Permission permission;
 
 	public void onEnable(){
-		try{		
+		try{
 			Package[] a = Package.getPackages();
 			Package pl = null;
 			for(Package p : a)
@@ -152,6 +151,18 @@ public class Main extends JavaPlugin{
 		for(CustomRecipe cust : this.customRecipes)
 		{
 			if((cust.recipe.getResult().getTypeId()+":"+cust.recipe.getResult().getDurability()).equals(result))
+			{
+				return cust;
+			}
+		}
+		return null;
+	}
+	
+	public CustomRecipe getCustomRecipeByName(String name)
+	{
+		for(CustomRecipe cust : this.customRecipes)
+		{
+			if(cust.name.equalsIgnoreCase(name))
 			{
 				return cust;
 			}

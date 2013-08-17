@@ -29,7 +29,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 public class Config {
 
 	private Main plugin;
-	
+
 	public FileConfiguration defaultConfig;
 
 	public FileConfiguration crafting;
@@ -39,15 +39,15 @@ public class Config {
 	public Config(Main plugin){
 		this.plugin = plugin;
 		this.defaultConfig = plugin.getConfig();
-		
+
 		if(defaultConfig.get("enableUpdateChecking") == null)
 		{
 			defaultConfig.set("enableUpdateChecking", true);
 			plugin.saveConfig();
 		}
-		
+
 		Updater.updateChecking = defaultConfig.getBoolean("enableUpdateChecking");
-		
+
 		File crafting = new File(plugin.getDataFolder(), "crafting.yml");
 		File furnace = new File(plugin.getDataFolder(), "furnace.yml");
 
@@ -100,6 +100,8 @@ public class Config {
 
 				List<String> enchants = crafting.getStringList("config.crafts."+key+".enchantments");
 
+				List<String> lores = crafting.getStringList("config.crafts."+key+".lores");
+
 				boolean shapelessRecipe = crafting.getBoolean("config.crafts."+key+".shapelessRecipe");
 
 				boolean override = crafting.getBoolean("config.crafts."+key+".override");
@@ -132,7 +134,7 @@ public class Config {
 					metadata = (short)crafting.getInt("config.crafts."+key+".metadata");
 					shpedre = new ItemStack(toCraft, quantity, metadata);
 				}
-				
+
 				if(enchants != null && !enchants.isEmpty()){
 					for(String str : enchants)
 					{
@@ -149,6 +151,17 @@ public class Config {
 					shpedre.setItemMeta(tmp);
 				}
 
+				if(lores != null && !lores.isEmpty()){
+					List<String> lstmp = new ArrayList<String>();
+					for(String s : lores)
+					{
+						lstmp.add(ChatColor.RESET + s.replaceAll("(&([a-f0-9]))", "§$2"));
+					}
+					ItemMeta tmp = shpedre.getItemMeta();
+					tmp.setLore(lstmp);
+					shpedre.setItemMeta(tmp);
+				}
+
 				Recipe recipes = new ShapedRecipe(shpedre);
 
 				CustomRecipe custRecipe = new CustomShapedRecipe();
@@ -159,6 +172,7 @@ public class Config {
 					custRecipe = new CustomShapelessRecipe();
 				}
 
+				custRecipe.name = key;
 				custRecipe.plugin = plugin;
 				custRecipe.usePermission = usePermission;
 				custRecipe.permission = permission;
@@ -186,40 +200,58 @@ public class Config {
 					int quantityIng = 1;
 					Material material;
 
-					if(section2.getString(key2).contains(":") && section2.getString(key2).contains("x"))
+					if(plugin.getCustomRecipeByName(section2.getString(key2)) != null)
 					{
-						meta = Short.parseShort(section2.getString(key2).split(":")[1].split("x")[0]);
-						material = Material.getMaterial(Integer.parseInt(section2.getString(key2).split(":")[0]));
-						quantityIng = Short.parseShort(section2.getString(key2).split("x")[1]);
-					}
-					else if(section2.getString(key2).contains(":"))
-					{
-						meta = Short.parseShort(section2.getString(key2).split(":")[1]);
-						material = Material.getMaterial(Integer.parseInt(section2.getString(key2).split(":")[0]));
-					}
-					else if(section2.getString(key2).contains("x"))
-					{
-						meta = Short.parseShort(section2.getString(key2).split("x")[0]);
-						material = Material.getMaterial(Integer.parseInt(section2.getString(key2).split(":")[0]));
-						quantityIng = Integer.parseInt(section2.getString(key2).split("x")[1]);
-					}
-					else
-					{
-						material = Material.getMaterial(Integer.parseInt(section2.getString(key2)));
-					}
+						try{
+							if(!shapelessRecipe)
+							{
+								((ShapedRecipe)recipes).setIngredient(c, plugin.getCustomRecipeByName(section2.getString(key2)).recipe.getResult().getData());
+							}
+							else
+							{
+								((ShapelessRecipe)recipes).addIngredient(plugin.getCustomRecipeByName(section2.getString(key2)).recipe.getResult().getData());
+							}
 
-					try{
-						if(!shapelessRecipe)
+						}catch(Exception e){
+							System.out.println("ERREUR DURRING ADDING RECIPE FOR: "+toCraft.name()+":"+metadata);
+						}
+					}else{
+
+						if(section2.getString(key2).contains(":") && section2.getString(key2).contains("x"))
 						{
-							((ShapedRecipe)recipes).setIngredient(c, material, meta);
+							meta = Short.parseShort(section2.getString(key2).split(":")[1].split("x")[0]);
+							material = Material.getMaterial(Integer.parseInt(section2.getString(key2).split(":")[0]));
+							quantityIng = Short.parseShort(section2.getString(key2).split("x")[1]);
+						}
+						else if(section2.getString(key2).contains(":"))
+						{
+							meta = Short.parseShort(section2.getString(key2).split(":")[1]);
+							material = Material.getMaterial(Integer.parseInt(section2.getString(key2).split(":")[0]));
+						}
+						else if(section2.getString(key2).contains("x"))
+						{
+							meta = Short.parseShort(section2.getString(key2).split("x")[0]);
+							material = Material.getMaterial(Integer.parseInt(section2.getString(key2).split(":")[0]));
+							quantityIng = Integer.parseInt(section2.getString(key2).split("x")[1]);
 						}
 						else
 						{
-							((ShapelessRecipe)recipes).addIngredient(quantityIng, material, meta);
+							material = Material.getMaterial(Integer.parseInt(section2.getString(key2)));
 						}
 
-					}catch(Exception e){
-						System.out.println("ERREUR DURRING ADDING RECIPE FOR: "+toCraft.name()+":"+metadata);
+						try{
+							if(!shapelessRecipe)
+							{
+								((ShapedRecipe)recipes).setIngredient(c, material, meta);
+							}
+							else
+							{
+								((ShapelessRecipe)recipes).addIngredient(quantityIng, material, meta);
+							}
+
+						}catch(Exception e){
+							System.out.println("ERREUR DURRING ADDING RECIPE FOR: "+toCraft.name()+":"+metadata);
+						}
 					}
 				}
 
@@ -245,18 +277,30 @@ public class Config {
 
 				Material material = Material.getMaterial(furnace.getInt("config.smelts."+key+".resultID"));
 				short metaResult = (short) furnace.getInt("config.smelts."+key+".result_MetaData");
-				
+
 				String customName = crafting.getString("config.smelts."+key+".result_customName");
+				List<String> lores = crafting.getStringList("config.smelts."+key+".result_lores");
 
 				Material ingredient = Material.getMaterial(furnace.getInt("config.smelts."+key+".ingredientID"));
 				short metaIngredient = (short) furnace.getInt("config.smelts."+key+".ingredient_MetaData");
-				
+
 				ItemStack shpedre = new ItemStack(material, 1, metaResult);
-				
+
 				if(customName != null)
 				{
 					ItemMeta tmp = shpedre.getItemMeta();
 					tmp.setDisplayName(ChatColor.RESET + customName.replaceAll("(&([a-f0-9]))", "§$2"));
+					shpedre.setItemMeta(tmp);
+				}
+
+				if(lores != null && !lores.isEmpty()){
+					List<String> lstmp = new ArrayList<String>();
+					for(String s : lores)
+					{
+						lstmp.add(ChatColor.RESET + s.replaceAll("(&([a-f0-9]))", "§$2"));
+					}
+					ItemMeta tmp = shpedre.getItemMeta();
+					tmp.setLore(lstmp);
 					shpedre.setItemMeta(tmp);
 				}
 

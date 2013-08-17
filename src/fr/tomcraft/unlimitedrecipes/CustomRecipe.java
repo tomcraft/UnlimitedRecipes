@@ -11,6 +11,8 @@ import org.bukkit.inventory.ShapedRecipe;
 public class CustomRecipe {
 
 	public Main plugin;
+	
+	public String name;
 
 	public Recipe recipe;
 
@@ -25,8 +27,9 @@ public class CustomRecipe {
 
 	}
 
-	public CustomRecipe(Recipe recipe, Main plugin, boolean usePermission, String permission, boolean override)
+	public CustomRecipe(String name, Recipe recipe, Main plugin, boolean usePermission, String permission, boolean override)
 	{
+		this.name = name;
 		this.plugin = plugin;
 		this.recipe = recipe;
 		this.usePermission = usePermission;

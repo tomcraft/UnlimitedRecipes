@@ -14,9 +14,9 @@ public class CustomShapedRecipe extends CustomRecipe{
 		
 	}
 
-	public CustomShapedRecipe(ShapedRecipe recipe, Main plugin,
+	public CustomShapedRecipe(String name, ShapedRecipe recipe, Main plugin,
 			boolean usePermission, String permission, boolean override) {
-		super(recipe, plugin, usePermission, permission, override);
+		super(name, recipe, plugin, usePermission, permission, override);
 		// TODO Auto-generated constructor stub
 	}
 

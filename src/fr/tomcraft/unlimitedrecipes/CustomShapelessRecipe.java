@@ -9,9 +9,9 @@ public class CustomShapelessRecipe extends CustomRecipe{
 		
 	}
 	
-	public CustomShapelessRecipe(ShapelessRecipe recipe, Main plugin,
+	public CustomShapelessRecipe(String name, ShapelessRecipe recipe, Main plugin,
 			boolean usePermission, String permission, boolean override) {
-		super(recipe, plugin, usePermission, permission, override);
+		super(name, recipe, plugin, usePermission, permission, override);
 		// TODO Auto-generated constructor stub
 	}
 

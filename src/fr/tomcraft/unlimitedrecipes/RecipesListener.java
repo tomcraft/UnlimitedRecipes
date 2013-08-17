@@ -45,7 +45,7 @@ public class RecipesListener implements Listener{
 
 					ItemStack custom = plugin.getCustomRecipeByResult(recipe.getResult().getTypeId()+":"+recipe.getResult().getDurability()).recipe.getResult();
 
-					if(result.getType() == custom.getType() && result.getDurability() == custom.getDurability() && !((ShapedRecipe)plugin.getCustomRecipeByResult(recipe.getResult().getTypeId()+":"+recipe.getResult().getDurability()).recipe).getShape().equals(recipe.getShape()))
+					if(!result.isSimilar(custom))
 					{
 						e.getInventory().setResult(null);
 					}

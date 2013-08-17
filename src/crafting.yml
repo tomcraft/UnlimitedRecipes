@@ -8,6 +8,10 @@ config:
       metadata: 0
       quantity: 2
       customName: '&2Crafted &1Item &3CustomName'
+      lores:
+      - '&cA &bline'
+      - '&1An &2other'
+      - '&4And &5an &3other too'
       shapelessRecipe: false
       recipe:
       - 'aaa'
