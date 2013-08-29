@@ -21,7 +21,7 @@ public class Main extends JavaPlugin{
 
 	public static String PACKAGE_NAME_SERVER;
 	public static String PACKAGE_NAME_CRAFTBUKKIT;
-	public Config config;
+	public static Config config;
 	public ArrayList<CustomRecipe> customRecipes;
 	public ArrayList<Map<Character,ItemStack>> customShapedCrafts;
 	private Permission permission;
@@ -29,14 +29,12 @@ public class Main extends JavaPlugin{
 	public void onEnable(){
 		try{
 			Package[] a = Package.getPackages();
-			Package pl = null;
 			for(Package p : a)
 			{
 				if(p.getName().startsWith("net.minecraft.server"))
 				{
 					try{
 						Class.forName(p.getName()+".Block");
-						pl = p;
 						Main.PACKAGE_NAME_SERVER = p.getName();
 					}catch(Exception e){}
 				}
@@ -44,7 +42,6 @@ public class Main extends JavaPlugin{
 				{
 					try{
 						Class.forName(p.getName()+".CraftServer");
-						pl = p;
 						Main.PACKAGE_NAME_CRAFTBUKKIT = p.getName();
 					}catch(Exception e){}
 				}
@@ -88,7 +85,7 @@ public class Main extends JavaPlugin{
 
 				this.getServer().resetRecipes();
 
-				this.config = null;
+				Main.config = null;
 
 				this.onEnable();
 

@@ -213,7 +213,7 @@ public class Config {
 							}
 
 						}catch(Exception e){
-							System.out.println("ERREUR DURRING ADDING RECIPE FOR: "+toCraft.name()+":"+metadata);
+							System.out.println("ERROR DURRING ADDING RECIPE FOR: "+toCraft.name()+":"+metadata);
 						}
 					}else{
 
@@ -278,8 +278,8 @@ public class Config {
 				Material material = Material.getMaterial(furnace.getInt("config.smelts."+key+".resultID"));
 				short metaResult = (short) furnace.getInt("config.smelts."+key+".result_MetaData");
 
-				String customName = crafting.getString("config.smelts."+key+".result_customName");
-				List<String> lores = crafting.getStringList("config.smelts."+key+".result_lores");
+				String customName = furnace.getString("config.smelts."+key+".result_customName");
+				List<String> lores = furnace.getStringList("config.smelts."+key+".result_lores");
 
 				Material ingredient = Material.getMaterial(furnace.getInt("config.smelts."+key+".ingredientID"));
 				short metaIngredient = (short) furnace.getInt("config.smelts."+key+".ingredient_MetaData");

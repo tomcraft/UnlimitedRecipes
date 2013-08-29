@@ -1,17 +1,11 @@
 package fr.tomcraft.unlimitedrecipes;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Map;
-
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.ShapedRecipe;
 
 public class CustomRecipe {
 
 	public Main plugin;
-	
+
 	public String name;
 
 	public Recipe recipe;
@@ -40,52 +34,63 @@ public class CustomRecipe {
 	public void register()
 	{
 		this.plugin.customRecipes.add(this);
-		
+
 		/*if(recipe instanceof ShapedRecipe)
 		{
-			addToCraftingManagerShaped();
+			try {
+				addToCraftingManagerShaped();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return;
 		}*/
-		
+
 		this.plugin.getServer().addRecipe(recipe);
 	}
 
-	public void addToCraftingManagerShaped() {
-		try{
-			Object[] data;
-			String[] shape = ((ShapedRecipe)recipe).getShape();
-			Map<Character, ItemStack> ingred = ((ShapedRecipe)recipe).getIngredientMap();
-			int datalen = shape.length;
-			datalen += ingred.size() * 2;
-			int i = 0;
-			data = new Object[datalen];
-			for (; i < shape.length; i++) {
-				data[i] = shape[i];
-			}
-			for (char c : ingred.keySet()) {
-				ItemStack mdata = ingred.get(c);
-				if (mdata == null) continue;
-				data[i] = c;
-				i++;
-				int id = mdata.getTypeId();
-				short dmg = mdata.getDurability();
-				int amount = mdata.getAmount();
-				data[i] = Class.forName(Main.PACKAGE_NAME_SERVER+".ItemStack").getConstructor(int.class, int.class, int.class).newInstance(id, amount, dmg);
-				i++;
-			}
-			
-			Class<?> c = Class.forName(Main.PACKAGE_NAME_SERVER+".CraftingManager");
-			Class<?> ci = Class.forName(Main.PACKAGE_NAME_CRAFTBUKKIT+".inventory.CraftItemStack");
-			Method m = c.getDeclaredMethod("registerShapedRecipe", Class.forName(Main.PACKAGE_NAME_SERVER+".ItemStack"), Object[].class);
-			Method mi = ci.getDeclaredMethod("asNMSCopy", ItemStack.class);
-			Object its = mi.invoke(ci, ((ShapedRecipe)recipe).getResult());
-			System.out.println(its);
-			System.out.println(Arrays.asList(data));
-			m.invoke(c, its, data);
-			//CraftingManager.getInstance().registerShapedRecipe((net.minecraft.server.v1_5_R3.ItemStack) its, data);
-		}catch(Exception e)
+	/*public void addToCraftingManagerShaped() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException, InstantiationException {
+		ShapedRecipe sr = (ShapedRecipe)recipe;
+
+		ArrayList<Object> trucs = new ArrayList<Object>();
+
+
+		for(String s : sr.getShape())
 		{
-			e.printStackTrace();
+			if(s != null)
+				trucs.add(s);
 		}
+
+		for(char c : ((CustomShapedRecipe)this).ingredients.keySet())
+		{
+			if(((CustomShapedRecipe)this).ingredients.get(c) != null){
+				trucs.add(c);
+				trucs.add(toNMSItemStack(this, ((CustomShapedRecipe)this).ingredients.get(c)));
+			}
+		}
+		System.out.println(trucs);
+		Object nmsIts = toNMSItemStack(this, recipe.getResult());
+
+		Method toCall = Class.forName(Main.PACKAGE_NAME_SERVER+".CraftingManager").getMethod("registerShapedRecipe", Class.forName(Main.PACKAGE_NAME_SERVER+".ItemStack"), Object[].class);
+
+		List tmp = CraftingManager.getInstance().recipes;
+
+		tmp.add(toCall.invoke(toCall.getDeclaringClass().newInstance(), nmsIts, trucs.toArray()));
+
+		CraftingManager.getInstance().recipes = tmp; //
+		Method toCallAfter = Class.forName(Main.PACKAGE_NAME_SERVER+".CraftingManager").getMethod("sort");
+
+		toCallAfter.invoke(toCallAfter.getDeclaringClass().newInstance());
+
+
+
+		//	CraftingManager.getInstance().registerShapedRecipe(CraftItemStack.asNMSCopy(recipe.getResult()), trucs.toArray());
 	}
+
+
+	public static Object toNMSItemStack(Object invoker, org.bukkit.inventory.ItemStack bukkitIts) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException
+	{
+		return Class.forName(Main.PACKAGE_NAME_CRAFTBUKKIT+".inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(invoker, bukkitIts);
+	}*/
 
 }
