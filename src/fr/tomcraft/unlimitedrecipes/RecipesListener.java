@@ -23,9 +23,9 @@ public class RecipesListener implements Listener{
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerJoin(PlayerJoinEvent e)
 	{
-		if(Updater.updateAvailable && plugin.hasPermission(e.getPlayer(), "ur.update"))
+		if(UpdateThread.updateAvailable && plugin.hasPermission(e.getPlayer(), "ur.update"))
 		{
-			e.getPlayer().sendMessage(ChatColor.RED + "[UnlimitedRecipes] An update is available, you can get it here:");
+			e.getPlayer().sendMessage(ChatColor.RED + "[UnlimitedRecipes] An update is available,"+ (UpdateThread.updateDownloading ? " it will be apply on next restart." : " you can get it here: "));
 			e.getPlayer().sendMessage(ChatColor.RED+"http://dev.bukkit.org/bukkit-plugins/unlimitedrecipes/ (click)");
 		}
 	}

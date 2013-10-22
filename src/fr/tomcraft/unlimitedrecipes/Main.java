@@ -3,6 +3,8 @@ package fr.tomcraft.unlimitedrecipes;
 import java.util.ArrayList;
 import java.util.Map;
 
+import net.gravitydevelopment.updater.Updater;
+import net.gravitydevelopment.updater.Updater.UpdateType;
 import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.ChatColor;
@@ -19,14 +21,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin{
 
+	public static Main instance;
 	public static String PACKAGE_NAME_SERVER;
 	public static String PACKAGE_NAME_CRAFTBUKKIT;
 	public static Config config;
 	public ArrayList<CustomRecipe> customRecipes;
 	public ArrayList<Map<Character,ItemStack>> customShapedCrafts;
 	private Permission permission;
+	public static Updater updater;
 
 	public void onEnable(){
+		instance = this;
 		try{
 			Package[] a = Package.getPackages();
 			for(Package p : a)
@@ -45,18 +50,20 @@ public class Main extends JavaPlugin{
 						Main.PACKAGE_NAME_CRAFTBUKKIT = p.getName();
 					}catch(Exception e){}
 				}
-					
+
 			}
-			
+
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		
+
 		customRecipes = new ArrayList<CustomRecipe>();
 		customShapedCrafts = new ArrayList<Map<Character,ItemStack>>();
 		config = new Config(this);
 		config.loadConfigs();
-		Updater.start();
+		
+		UpdateThread.start();
+
 		setupPermissions();
 		this.getServer().getPluginManager().registerEvents(new RecipesListener(this), this);
 	}
@@ -112,7 +119,7 @@ public class Main extends JavaPlugin{
 		}
 		return (permission != null);
 	}
-	
+
 	public CustomRecipe getCustomRecipeByRecipe(Recipe recipe)
 	{
 		for(CustomRecipe cust : this.customRecipes)
@@ -138,11 +145,11 @@ public class Main extends JavaPlugin{
 					return (CustomFurnaceRecipe)cust;
 				}
 			}
-			
+
 		}
 		return null;
 	}
-	
+
 	public CustomRecipe getCustomRecipeByResult(String result)
 	{
 		for(CustomRecipe cust : this.customRecipes)
@@ -154,7 +161,7 @@ public class Main extends JavaPlugin{
 		}
 		return null;
 	}
-	
+
 	public CustomRecipe getCustomRecipeByName(String name)
 	{
 		for(CustomRecipe cust : this.customRecipes)
@@ -166,7 +173,7 @@ public class Main extends JavaPlugin{
 		}
 		return null;
 	}
-	
+
 	public boolean isCustomRecipe(Recipe recipe)
 	{
 		if(getCustomRecipeByRecipe(recipe) != null)
@@ -175,5 +182,10 @@ public class Main extends JavaPlugin{
 		}
 		return false;
 	}
-	
+
+	public static void renewUpdater()
+	{
+		Main.updater = new Updater(Main.instance, 52907, Main.instance.getFile(), UpdateThread.updateDownloading ? UpdateType.DEFAULT : UpdateType.NO_DOWNLOAD, false);
+	}
+
 }

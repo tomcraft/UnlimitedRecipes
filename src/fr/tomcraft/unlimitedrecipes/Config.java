@@ -45,8 +45,15 @@ public class Config {
 			defaultConfig.set("enableUpdateChecking", true);
 			plugin.saveConfig();
 		}
+		
+		if(defaultConfig.get("enableUpdateDownloading") == null)
+		{
+			defaultConfig.set("enableUpdateDownloading", false);
+			plugin.saveConfig();
+		}
 
-		Updater.updateChecking = defaultConfig.getBoolean("enableUpdateChecking");
+		UpdateThread.updateChecking = defaultConfig.getBoolean("enableUpdateChecking");
+		UpdateThread.updateDownloading = defaultConfig.getBoolean("enableUpdateDownloading");
 
 		File crafting = new File(plugin.getDataFolder(), "crafting.yml");
 		File furnace = new File(plugin.getDataFolder(), "furnace.yml");
