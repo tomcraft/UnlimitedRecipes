@@ -16,8 +16,8 @@ public class CustomShapedRecipe extends CustomRecipe{
 	}
 
 	public CustomShapedRecipe(String name, ShapedRecipe recipe, Main plugin,
-			boolean usePermission, String permission, boolean override) {
-		super(name, recipe, plugin, usePermission, permission, override);
+			boolean usePermission, String permission, boolean override, boolean deleteOthers) {
+		super(name, recipe, plugin, usePermission, permission, override, deleteOthers);
 	}
 
 }

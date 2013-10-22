@@ -36,38 +36,30 @@ public class RecipesListener implements Listener{
 		if(e.getRecipe() instanceof ShapedRecipe)
 		{
 			ShapedRecipe recipe = ((ShapedRecipe)e.getRecipe());
-
-			if(!plugin.isCustomRecipe(recipe))
+			String resultS = recipe.getResult().getTypeId()+":"+recipe.getResult().getDurability();
+			if(!plugin.isCustomRecipe(recipe) && e.getInventory().getResult() != null)
 			{
-				if(plugin.getCustomRecipeByResult(recipe.getResult().getTypeId()+":"+recipe.getResult().getDurability()) != null && plugin.getCustomRecipeByResult(recipe.getResult().getTypeId()+":"+recipe.getResult().getDurability()).override)
+				
+				if(plugin.getCustomRecipeByResult(resultS) != null && plugin.getCustomRecipeByResult(resultS).deleteOthers)
 				{
 					ItemStack result = recipe.getResult();
 
-					ItemStack custom = plugin.getCustomRecipeByResult(recipe.getResult().getTypeId()+":"+recipe.getResult().getDurability()).recipe.getResult();
+					ItemStack custom = plugin.getCustomRecipeByResult(resultS).recipe.getResult();
 
-					if(!result.isSimilar(custom))
+					if(!result.isSimilar(custom) || result.getItemMeta() != custom.getItemMeta())
 					{
 						e.getInventory().setResult(null);
+						if(plugin.getCustomRecipeByResult(resultS).override)
+						{
+							this.checkCustomShapedRecipeValid(e, recipe, resultS);
+						}
 					}
 
 				}
 			}
 			else
 			{
-				if(plugin.getCustomRecipeByRecipe(recipe).usePermission && !plugin.hasPermission(e.getView().getPlayer().getName(), plugin.getCustomRecipeByRecipe(recipe).permission))
-				{
-					e.getInventory().setResult(null);
-					return;
-				}
-
-				if(recipe.getResult().getType() == Material.SKULL_ITEM && ((SkullMeta)recipe.getResult().getItemMeta()).getOwner().equalsIgnoreCase("--CrafterHead"))
-				{
-					ItemStack result = recipe.getResult();
-					SkullMeta meta = ((SkullMeta)result.getItemMeta());
-					meta.setOwner(e.getView().getPlayer().getName());
-					result.setItemMeta(meta);
-					e.getInventory().setResult(result);
-				}
+				this.checkCustomShapedRecipeValid(e, recipe, resultS);
 			}
 
 		}
@@ -106,6 +98,29 @@ public class RecipesListener implements Listener{
 					e.getInventory().setResult(result);
 				}
 			}
+		}
+	}
+	
+	public void checkCustomShapedRecipeValid(PrepareItemCraftEvent e, ShapedRecipe recipe, String resultS)
+	{
+		if(e.getInventory().getResult() == null)
+		{
+			e.getInventory().setResult(plugin.getCustomRecipeByResult(resultS).recipe.getResult());
+		}
+		
+		if(plugin.getCustomRecipeByResult(resultS).usePermission && !plugin.hasPermission(e.getView().getPlayer().getName(), plugin.getCustomRecipeByName(resultS).permission))
+		{
+			e.getInventory().setResult(null);
+			return;
+		}
+
+		if(recipe.getResult().getType() == Material.SKULL_ITEM && ((SkullMeta)recipe.getResult().getItemMeta()).getOwner().equalsIgnoreCase("--CrafterHead"))
+		{
+			ItemStack result = recipe.getResult();
+			SkullMeta meta = ((SkullMeta)result.getItemMeta());
+			meta.setOwner(e.getView().getPlayer().getName());
+			result.setItemMeta(meta);
+			e.getInventory().setResult(result);
 		}
 	}
 }

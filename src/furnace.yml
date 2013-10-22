@@ -7,4 +7,3 @@ config:
       result_customName: "&2An &1awesome &3block"
       ingredientID: 1
       ingredient_MetaData: 0
-      override: false

@@ -15,13 +15,15 @@ public class CustomRecipe {
 	public String permission;
 
 	public boolean override;
+	
+	public boolean deleteOthers;
 
 	public CustomRecipe()
 	{
 
 	}
 
-	public CustomRecipe(String name, Recipe recipe, Main plugin, boolean usePermission, String permission, boolean override)
+	public CustomRecipe(String name, Recipe recipe, Main plugin, boolean usePermission, String permission, boolean override, boolean deleteOthers)
 	{
 		this.name = name;
 		this.plugin = plugin;
@@ -29,6 +31,7 @@ public class CustomRecipe {
 		this.usePermission = usePermission;
 		this.permission = permission;
 		this.override = override;
+		this.deleteOthers = deleteOthers;
 	}
 
 	public void register()

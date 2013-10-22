@@ -105,6 +105,8 @@ public class Config {
 				boolean shapelessRecipe = crafting.getBoolean("config.crafts."+key+".shapelessRecipe");
 
 				boolean override = crafting.getBoolean("config.crafts."+key+".override");
+				
+				boolean deleteOthers = crafting.getBoolean("config.crafts."+key+".deleteOthers");
 
 				String permission = "ur.craft." + key;
 
@@ -177,6 +179,7 @@ public class Config {
 				custRecipe.usePermission = usePermission;
 				custRecipe.permission = permission;
 				custRecipe.override = override;
+				custRecipe.deleteOthers = deleteOthers;
 
 
 				if(!shapelessRecipe)
@@ -273,7 +276,6 @@ public class Config {
 		if(furnace.getConfigurationSection("config.smelts") != null){
 			Set<String> keys = furnace.getConfigurationSection("config.smelts").getKeys(false);
 			for(String key : keys){
-				//ConfigurationSection section = furnace.getConfigurationSection("config.smelts");
 
 				Material material = Material.getMaterial(furnace.getInt("config.smelts."+key+".resultID"));
 				short metaResult = (short) furnace.getInt("config.smelts."+key+".result_MetaData");

@@ -119,7 +119,7 @@ public class Main extends JavaPlugin{
 		{
 			if(recipe instanceof ShapedRecipe && cust.recipe instanceof ShapedRecipe)
 			{
-				if(this.customShapedCrafts.contains(((ShapedRecipe)cust.recipe).getIngredientMap()) && recipe.getResult().getType() == cust.recipe.getResult().getType() && recipe.getResult().getDurability() == cust.recipe.getResult().getDurability())
+				if(this.customShapedCrafts.contains(((ShapedRecipe)cust.recipe).getIngredientMap()) && recipe.getResult().getType() == cust.recipe.getResult().getType() && recipe.getResult().getDurability() == cust.recipe.getResult().getDurability() && recipe.getResult().getItemMeta() == cust.recipe.getResult().getItemMeta())
 				{
 					return (CustomShapedRecipe)cust;
 				}
