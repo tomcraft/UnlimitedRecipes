@@ -33,7 +33,7 @@ public class UpdateThread implements Runnable{
 		Main.renewUpdater();
 		if(Main.updater.getResult() == UpdateResult.UPDATE_AVAILABLE)
 		{
-			Bukkit.getConsoleSender().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + "[UnlimitedRecipes] " + ChatColor.RESET + ChatColor.RED + "An update is available,"+ (UpdateThread.updateDownloading ? " it will be apply on next restart." : " you can get it here: "));
+			Bukkit.getConsoleSender().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + "[UnlimitedRecipes] " + ChatColor.RESET + ChatColor.RED + "An update is available,"+ (UpdateThread.updateDownloading ? " it will be applied on next restart." : " you can get it here: "));
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED+"http://dev.bukkit.org/bukkit-plugins/unlimitedrecipes/");
             return true;
 		}
