@@ -1,7 +1,7 @@
 name: UnlimitedRecipes
-main: fr.tomcraft.unlimitedrecipes.Main
+main: fr.tomcraft.unlimitedrecipes.URPlugin
 author: Xx_tomcraft_xX
-version: 1.8.1
+version: 2.0
 depend: [Vault]
 commands:
     ur:
