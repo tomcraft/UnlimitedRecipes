@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -30,6 +31,7 @@ import fr.tomcraft.unlimitedrecipes.CustomRecipe.RecipeType;
 
 public class Config
 {
+    private static Logger LOG = Logger.getLogger("Minecraft.UnlimitedRecipes");
 
     public static FileConfiguration defaultConfig;
     public static FileConfiguration crafting;
@@ -122,10 +124,11 @@ public class Config
                     {
                         try
                         {
-                            shpedre.addEnchantment(Enchantment.getById(Integer.valueOf(str.split(":")[0])), Integer.valueOf(str.split(":")[1]));
+                            shpedre.addUnsafeEnchantment(Enchantment.getById(Integer.valueOf(str.split(":")[0])), Integer.valueOf(str.split(":")[1]));
                         }
                         catch (Exception e)
                         {
+                            LOG.warning("Unable to add enchantment to '" + key + "' " + e.getMessage());
                         }
                     }
                 }
