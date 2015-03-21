@@ -51,7 +51,6 @@ public class URPlugin extends JavaPlugin
                     sender.sendMessage(ChatColor.RED + "Usage: /ur reload");
                     return false;
                 }
-                Bukkit.resetRecipes();
                 RecipesManager.reset();
                 onEnable();
             }

@@ -13,7 +13,6 @@ public class CustomRecipe
     public Recipe recipe;
     public boolean usePermission;
     public String permission;
-    public boolean override;
     public boolean deleteOthers;
     public Map<Character, ItemStack> ingredients;
 
@@ -28,7 +27,6 @@ public class CustomRecipe
         this.recipe = recipe;
         this.usePermission = usePermission;
         this.permission = permission;
-        this.override = override;
         this.deleteOthers = deleteOthers;
     }
 

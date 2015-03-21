@@ -1,7 +1,7 @@
-name: UnlimitedRecipes
+name: ${project.name}
 main: fr.tomcraft.unlimitedrecipes.URPlugin
 author: Xx_tomcraft_xX
-version: 2.0
+version: ${project.version}
 depend: [Vault]
 commands:
     ur:

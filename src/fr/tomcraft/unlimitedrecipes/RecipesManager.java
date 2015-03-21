@@ -20,6 +20,7 @@ public class RecipesManager
     
     public static void reset()
     {
+        Bukkit.resetRecipes();
         customRecipes = new ArrayList<CustomRecipe>();
         customShapedCrafts = new ArrayList<Map<Character, ItemStack>>();
     }
@@ -39,15 +40,14 @@ public class RecipesManager
     {
         for (CustomRecipe cust : RecipesManager.customRecipes)
         {
+            if(!recipe.getResult().equals(cust.recipe.getResult()))
+            {
+                continue;
+            }
+            
             if (recipe instanceof ShapedRecipe && cust.type == RecipeType.SHAPED_RECIPE)
             {                
-                ItemStack custResult = cust.recipe.getResult();
-                ItemStack bukkitResult = recipe.getResult();
-                
-                if (bukkitResult.getType() == custResult.getType() && bukkitResult.getDurability() == custResult.getDurability() && bukkitResult.getItemMeta().getDisplayName() == custResult.getItemMeta().getDisplayName())
-                {
-                    return cust;
-                }
+                return cust;
             }
             else if (recipe instanceof ShapelessRecipe && cust.type == RecipeType.SHAPELESS_RECIPE)
             {
@@ -74,7 +74,8 @@ public class RecipesManager
     {
         for (CustomRecipe cust : RecipesManager.customRecipes)
         {
-            if ((cust.recipe.getResult().getTypeId() + ":" + cust.recipe.getResult().getDurability()).equals(result))
+            ItemStack its = cust.recipe.getResult();
+            if ((its.getType().name() + ":" + its.getDurability()).equals(result))
             {
                 return cust;
             }

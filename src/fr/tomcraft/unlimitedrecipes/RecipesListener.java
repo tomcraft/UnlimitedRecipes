@@ -13,7 +13,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 public class RecipesListener implements Listener
 {
-
+    
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent e)
     {
@@ -23,13 +23,13 @@ public class RecipesListener implements Listener
             e.getPlayer().sendMessage(ChatColor.RED + "http://dev.bukkit.org/bukkit-plugins/unlimitedrecipes/ (click)");
         }
     }
-
+    
     @EventHandler
     public void onPlayerCraftEvent(PrepareItemCraftEvent e)
     {
         Recipe recipe = e.getRecipe();
         ItemStack result = recipe.getResult();
-        String resultS = recipe.getResult().getTypeId() + ":" + recipe.getResult().getDurability();
+        String resultString = result.getType().name() + ":" + result.getDurability();
         CustomRecipe custRecipe = null;
         
         if (RecipesManager.isCustomRecipe(recipe))
@@ -41,8 +41,8 @@ public class RecipesListener implements Listener
                 e.getInventory().setResult(null);
                 return;
             }
-
-            if (e.getRecipe().getResult().getType() == Material.SKULL_ITEM && ((SkullMeta)e.getRecipe().getResult().getItemMeta()).getOwner().equalsIgnoreCase("--CrafterHead"))
+            
+            if (recipe.getResult().getType() == Material.SKULL_ITEM && ((SkullMeta)result.getItemMeta()).getOwner().equalsIgnoreCase("--CrafterHead"))
             {
                 SkullMeta meta = (SkullMeta)result.getItemMeta();
                 meta.setOwner(e.getView().getPlayer().getName());
@@ -50,25 +50,14 @@ public class RecipesListener implements Listener
                 e.getInventory().setResult(result);
             }
         }
-        else
+        else if((custRecipe = RecipesManager.getCustomRecipeByResult(resultString)) != null)
         {
-            custRecipe = RecipesManager.getCustomRecipeByResult(resultS);
-            if (custRecipe != null && custRecipe.deleteOthers)
+            if (custRecipe.deleteOthers)
             {
-                ItemStack custom = custRecipe.recipe.getResult();
-
-                if (!result.isSimilar(custom) || result.getItemMeta() != custom.getItemMeta())
-                {
-                    e.getInventory().setResult(null);
-                    if (custRecipe.override)
-                    {
-                        e.getInventory().setResult(custRecipe.recipe.getResult());
-                    }
-                }
+                e.getInventory().setResult(null);
             }
-        }
-
+        }        
     }
-
-
+    
+    
 }
