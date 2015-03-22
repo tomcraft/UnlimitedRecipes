@@ -1,9 +1,10 @@
 package fr.tomcraft.unlimitedrecipes;
 
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.Iterator;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -16,13 +17,11 @@ public class RecipesManager
 {
 
     public static ArrayList<CustomRecipe> customRecipes = new ArrayList<CustomRecipe>();
-    public static ArrayList<Map<Character, ItemStack>> customShapedCrafts = new ArrayList<Map<Character, ItemStack>>();
     
     public static void reset()
     {
         Bukkit.resetRecipes();
         customRecipes = new ArrayList<CustomRecipe>();
-        customShapedCrafts = new ArrayList<Map<Character, ItemStack>>();
     }
 
     public static void registerRecipe(CustomRecipe recipe)
@@ -30,17 +29,64 @@ public class RecipesManager
         if (recipe.type == RecipeType.SHAPED_RECIPE)
         {
             recipe.ingredients = ((ShapedRecipe)recipe.recipe).getIngredientMap();
-            RecipesManager.customShapedCrafts.add(recipe.ingredients);
         }
         RecipesManager.customRecipes.add(recipe);
+        
+        if(recipe.deleteOthers)
+        {
+            unloadBukkitRecipes(recipe.recipe.getResult().getType(), recipe.recipe.getResult().getData().getData());
+        }
+        
         Bukkit.addRecipe(recipe.recipe);
+    }
+    
+    public static void unloadBukkitRecipe(Recipe toUnload)
+    {
+        Iterator<Recipe> it = Bukkit.recipeIterator();
+        Recipe recipe;
+        while(it.hasNext())
+        {
+            recipe = it.next();
+            if (recipe != null && !isCustomRecipe(recipe) && recipe.equals(toUnload))
+            {
+                it.remove();
+            }
+        }
+    }
+    
+    public static void unloadBukkitRecipes(Material toUnload)
+    {
+        Iterator<Recipe> it = Bukkit.recipeIterator();
+        Recipe recipe;
+        while(it.hasNext())
+        {
+            recipe = it.next();
+            if (recipe != null && !isCustomRecipe(recipe) && recipe.getResult().getType().equals(toUnload))
+            {
+                it.remove();
+            }
+        }
+    }
+    
+    public static void unloadBukkitRecipes(Material toUnload, byte data)
+    {
+        Iterator<Recipe> it = Bukkit.recipeIterator();
+        Recipe recipe;
+        while(it.hasNext())
+        {
+            recipe = it.next();
+            if (recipe != null && !isCustomRecipe(recipe) && recipe.getResult().getType().equals(toUnload) && recipe.getResult().getData().getData() == data)
+            {
+                it.remove();
+            }
+        }
     }
 
     public static CustomRecipe getCustomRecipeByRecipe(Recipe recipe)
     {
         for (CustomRecipe cust : RecipesManager.customRecipes)
         {
-            if(!recipe.getResult().equals(cust.recipe.getResult()))
+            if(!recipe.getResult().getData().equals(cust.recipe.getResult().getData()) || recipe.getResult().getAmount() != cust.recipe.getResult().getAmount())
             {
                 continue;
             }

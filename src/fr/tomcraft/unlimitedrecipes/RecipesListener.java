@@ -29,19 +29,16 @@ public class RecipesListener implements Listener
     {
         Recipe recipe = e.getRecipe();
         ItemStack result = recipe.getResult();
-        String resultString = result.getType().name() + ":" + result.getDurability();
         CustomRecipe custRecipe = null;
         
-        if (RecipesManager.isCustomRecipe(recipe))
+        if ((custRecipe = RecipesManager.getCustomRecipeByRecipe(recipe)) != null)
         {
-            custRecipe = RecipesManager.getCustomRecipeByRecipe(recipe);
-            
             if(custRecipe.usePermission && !URPlugin.hasPermission(e.getView().getPlayer().getName(), custRecipe.permission))
             {
                 e.getInventory().setResult(null);
                 return;
             }
-            
+                        
             if (recipe.getResult().getType() == Material.SKULL_ITEM && ((SkullMeta)result.getItemMeta()).getOwner().equalsIgnoreCase("--CrafterHead"))
             {
                 SkullMeta meta = (SkullMeta)result.getItemMeta();
@@ -50,13 +47,6 @@ public class RecipesListener implements Listener
                 e.getInventory().setResult(result);
             }
         }
-        else if((custRecipe = RecipesManager.getCustomRecipeByResult(resultString)) != null)
-        {
-            if (custRecipe.deleteOthers)
-            {
-                e.getInventory().setResult(null);
-            }
-        }        
     }
     
     
