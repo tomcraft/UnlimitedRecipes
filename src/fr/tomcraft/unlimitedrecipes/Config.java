@@ -34,7 +34,8 @@ public class Config
 {
     private static Logger LOG = Logger.getLogger("Minecraft.UnlimitedRecipes");
     
-
+    public static boolean debug = false;
+    
     public static File craftingFile;
     public static File furnaceFile;
     
@@ -69,6 +70,14 @@ public class Config
             Config.defaultConfig.set("blacklisted_items", Arrays.asList("STONE:0", "WORKBENCH", "61"));
             plugin.saveConfig();
         }
+        
+        if (Config.defaultConfig.get("debug") == null)
+        {
+            Config.defaultConfig.set("debug", false);
+            plugin.saveConfig();
+        }
+        
+        debug = Config.defaultConfig.getBoolean("debug");
         
         UpdateThread.updateChecking = Config.defaultConfig.getBoolean("enableUpdateChecking");
         UpdateThread.updateDownloading = Config.defaultConfig.getBoolean("enableUpdateDownloading");
@@ -137,15 +146,24 @@ public class Config
                     mat = getMaterial(item.split(":")[0]);
                     data = Byte.parseByte(item.split(":")[1]);
                     RecipesManager.unloadBukkitRecipes(mat, data);
-                    LOG.info("[UnlimitedRecipes] All recipes for " + mat.name() + ":" + data + " were deleted !");
+                    if(debug)
+                    {
+                        LOG.info("[UnlimitedRecipes] All recipes for " + mat.name() + ":" + data + " were deleted !");
+                    }
+                    
                 }
                 else
                 {
                     mat = getMaterial(item);
                     RecipesManager.unloadBukkitRecipes(mat);
-                    LOG.info("[UnlimitedRecipes] All recipes for " + mat.name() + " were deleted !");
+                    if(debug)
+                    {
+                        LOG.info("[UnlimitedRecipes] All recipes for " + mat.name() + " were deleted !");
+                    }
                 }
             }
+            
+            LOG.info("[UnlimitedRecipes] Recipes were deleted ! (" + blackListedItems.size() + " items)");
         }
     }
     
@@ -197,7 +215,7 @@ public class Config
                     metadata = (short)Config.crafting.getInt(key + ".metadata");
                     shpedre = new ItemStack(toCraft, quantity, metadata);
                 }
-
+                
                 applyCustomName(shpedre, customName);
                 
                 applyLores(shpedre, lores);
@@ -296,9 +314,12 @@ public class Config
                 }
                 custRecipe.recipe = recipe;
                 RecipesManager.registerRecipe(custRecipe);
-                LOG.info("[UnlimitedRecipes] Crafting Recipe for: " + toCraft.name() + ":" + metadata + " added !");
+                if(debug)
+                {
+                    LOG.info("[UnlimitedRecipes] Crafting Recipe for: " + toCraft.name() + ":" + metadata + " added !");
+                }
             }
-            LOG.info("[UnlimitedRecipes] All craft recipes loaded !");
+            LOG.info("[UnlimitedRecipes] All craft recipes loaded ! ("+keys.size() + " recipes)");
         }
     }
     
@@ -327,10 +348,13 @@ public class Config
                 applyLores(shpedre, lores);
                 FurnaceRecipe recipe = new FurnaceRecipe(shpedre, ingredient.getNewData(metaResult));
                 RecipesManager.registerRecipe(new CustomRecipe(RecipeType.FURNACE_RECIPE, name, recipe, false, null, false, false));
-                LOG.info("[UnlimitedRecipes] Furnace Recipe for: " + material.name() + " added !");
+                if(debug)
+                {
+                    LOG.info("[UnlimitedRecipes] Furnace Recipe for: " + material.name() + ":" + metaResult + " added !");
+                }
             }
+            LOG.info("[UnlimitedRecipes] All smelt recipes loaded ! ("+keys.size() + " recipes)");
         }
-        LOG.info("[UnlimitedRecipes] All smelt recipes loaded !");
     }
     
     public static String color(String string)
