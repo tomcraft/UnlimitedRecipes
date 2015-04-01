@@ -38,7 +38,7 @@ public class RecipesListener implements Listener
                 e.getInventory().setResult(null);
                 return;
             }
-                        
+            
             if (recipe.getResult().getType() == Material.SKULL_ITEM && ((SkullMeta)result.getItemMeta()).getOwner().equalsIgnoreCase("--CrafterHead"))
             {
                 SkullMeta meta = (SkullMeta)result.getItemMeta();
@@ -46,6 +46,31 @@ public class RecipesListener implements Listener
                 result.setItemMeta(meta);
                 e.getInventory().setResult(result);
             }
+            
+            if(custRecipe.transferDurability)
+            {
+                float totalDurability = 0;
+                float totalMaxDurability = 0;
+                
+                for(ItemStack its : e.getInventory().getMatrix())
+                {
+                    if(!its.getType().isBlock())
+                    {
+                        if(its.getType().getMaxDurability() > 16)
+                        {
+                            totalDurability =+ its.getDurability();
+                            totalMaxDurability =+ its.getType().getMaxDurability();
+                        }
+                    }
+                }
+                
+                short newDurability = (short)((totalDurability / totalMaxDurability) * (float)result.getType().getMaxDurability());
+                ItemStack newResult = result.clone();
+                newResult.setDurability(newDurability);
+                
+                e.getInventory().setResult(newResult);
+            }
+            
         }
     }
     

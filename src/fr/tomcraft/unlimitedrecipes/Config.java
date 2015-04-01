@@ -188,6 +188,7 @@ public class Config
                 List<String> lores = Config.crafting.getStringList(key + ".lores");
                 RecipeType recipeType = Config.crafting.getBoolean(key + ".shapelessRecipe") ? RecipeType.SHAPELESS_RECIPE : RecipeType.SHAPED_RECIPE;
                 boolean deleteOthers = Config.crafting.getBoolean(key + ".deleteOthers");
+                boolean transferDurability = Config.crafting.getBoolean(key + ".transferDurability");
                 boolean usePermission = Config.crafting.getBoolean(key + ".usePermission");
                 String customName = color(Config.crafting.getString(key + ".customName"));
                 
@@ -233,6 +234,7 @@ public class Config
                 custRecipe.usePermission = usePermission;
                 custRecipe.permission = permission;
                 custRecipe.deleteOthers = deleteOthers;
+                custRecipe.transferDurability = transferDurability;
                 if (recipeType == RecipeType.SHAPED_RECIPE)
                 {
                     List<String> shape_list = Config.crafting.getStringList(key + ".recipe");

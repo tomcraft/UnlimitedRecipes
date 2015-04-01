@@ -14,6 +14,7 @@ public class CustomRecipe
     public boolean usePermission;
     public String permission;
     public boolean deleteOthers;
+    public boolean transferDurability;
     public Map<Character, ItemStack> ingredients;
 
     public CustomRecipe()

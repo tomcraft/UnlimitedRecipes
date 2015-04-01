@@ -18,7 +18,7 @@ public class UpdateThread implements Runnable
     {
         if (UpdateThread.updateChecking)
         {
-            UpdateThread.task = Bukkit.getScheduler().runTaskTimerAsynchronously(Bukkit.getPluginManager().getPlugin("UnlimitedRecipes"), new UpdateThread(), 0L, 864000L);
+            UpdateThread.task = Bukkit.getScheduler().runTaskTimerAsynchronously(URPlugin.instance, new UpdateThread(), 0L, 864000L);
         }
     }
 
