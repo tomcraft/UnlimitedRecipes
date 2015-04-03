@@ -55,24 +55,12 @@ public class Config
     {
         URPlugin plugin = URPlugin.instance;
         Config.defaultConfig = plugin.getConfig();
+        
         if (Config.defaultConfig.get("enableUpdateChecking") == null)
         {
             Config.defaultConfig.set("enableUpdateChecking", true);
-            plugin.saveConfig();
-        }
-        if (Config.defaultConfig.get("enableUpdateDownloading") == null)
-        {
             Config.defaultConfig.set("enableUpdateDownloading", false);
-            plugin.saveConfig();
-        }
-        if (Config.defaultConfig.get("blacklisted_items") == null)
-        {
             Config.defaultConfig.set("blacklisted_items", Arrays.asList("STONE:0", "WORKBENCH", "61"));
-            plugin.saveConfig();
-        }
-        
-        if (Config.defaultConfig.get("debug") == null)
-        {
             Config.defaultConfig.set("debug", false);
             plugin.saveConfig();
         }
@@ -150,7 +138,6 @@ public class Config
                     {
                         LOG.info("[UnlimitedRecipes] All recipes for " + mat.name() + ":" + data + " were deleted !");
                     }
-                    
                 }
                 else
                 {

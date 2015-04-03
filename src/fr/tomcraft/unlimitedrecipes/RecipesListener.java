@@ -54,13 +54,10 @@ public class RecipesListener implements Listener
                 
                 for(ItemStack its : e.getInventory().getMatrix())
                 {
-                    if(!its.getType().isBlock())
+                    if(its != null && !its.getType().isBlock() && its.getType().getMaxDurability() > 16)
                     {
-                        if(its.getType().getMaxDurability() > 16)
-                        {
-                            totalDurability =+ its.getDurability();
-                            totalMaxDurability =+ its.getType().getMaxDurability();
-                        }
+                        totalDurability =+ its.getDurability();
+                        totalMaxDurability =+ its.getType().getMaxDurability();
                     }
                 }
                 
