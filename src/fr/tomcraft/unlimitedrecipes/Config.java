@@ -56,7 +56,12 @@ public class Config
         URPlugin plugin = URPlugin.instance;
         Config.defaultConfig = plugin.getConfig();
         
-        if (Config.defaultConfig.get("enableUpdateChecking") == null)
+        if ( !plugin.getDataFolder().exists())
+        {
+            plugin.getDataFolder().mkdirs();
+        }
+        
+        if (!new File(plugin.getDataFolder(), "config.yml").exists())
         {
             Config.defaultConfig.set("enableUpdateChecking", true);
             Config.defaultConfig.set("enableUpdateDownloading", false);
@@ -72,11 +77,7 @@ public class Config
         
         craftingFile = new File(plugin.getDataFolder(), "crafting.yml");
         furnaceFile = new File(plugin.getDataFolder(), "furnace.yml");
-        
-        if ( !plugin.getDataFolder().exists())
-        {
-            plugin.getDataFolder().mkdirs();
-        }
+                
         if ( !craftingFile.exists())
         {
             Config.extractFile("crafting.yml");
