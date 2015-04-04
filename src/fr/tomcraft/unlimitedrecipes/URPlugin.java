@@ -2,21 +2,18 @@ package fr.tomcraft.unlimitedrecipes;
 
 import net.gravitydevelopment.updater.Updater;
 import net.gravitydevelopment.updater.Updater.UpdateType;
-import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class URPlugin extends JavaPlugin
 {
 
     public static URPlugin instance;
-    private static Permission permission;
     public static Updater updater;
 
     @Override
@@ -24,7 +21,6 @@ public class URPlugin extends JavaPlugin
     {
         URPlugin.instance = this;
         reloadConfig();
-        setupPermissions();
         Bukkit.getPluginManager().registerEvents(new RecipesListener(), this);
     }
 
@@ -66,17 +62,7 @@ public class URPlugin extends JavaPlugin
     
     public static boolean hasPermission(CommandSender sender, String perm)
     {
-        return (URPlugin.permission != null && URPlugin.permission.has(sender, perm)) || sender.isOp();
-    }
-
-    private boolean setupPermissions()
-    {
-        RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
-        if (permissionProvider != null)
-        {
-            URPlugin.permission = permissionProvider.getProvider();
-        }
-        return URPlugin.permission != null;
+        return sender.hasPermission(perm) || sender.isOp();
     }
 
     public static void renewUpdater()
