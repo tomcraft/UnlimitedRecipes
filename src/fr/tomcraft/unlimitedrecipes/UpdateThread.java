@@ -16,7 +16,7 @@ public class UpdateThread implements Runnable
 
     public static void start()
     {
-        if (UpdateThread.updateChecking)
+        if (UpdateThread.updateChecking && UpdateThread.task == null)
         {
             UpdateThread.task = Bukkit.getScheduler().runTaskTimerAsynchronously(URPlugin.instance, new UpdateThread(), 0L, 864000L);
         }

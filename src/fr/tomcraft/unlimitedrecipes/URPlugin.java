@@ -23,7 +23,7 @@ public class URPlugin extends JavaPlugin
     public void onEnable()
     {
         URPlugin.instance = this;
-        Config.load();
+        reloadConfig();
         UpdateThread.start();
         setupPermissions();
         Bukkit.getPluginManager().registerEvents(new RecipesListener(), this);
@@ -51,14 +51,19 @@ public class URPlugin extends JavaPlugin
                     sender.sendMessage(ChatColor.RED + "Usage: /ur reload");
                     return false;
                 }
-                RecipesManager.reset();
                 reloadConfig();
-                Config.load();
             }
         }
         return true;
     }
 
+    public void reloadConfig()
+    {
+        super.reloadConfig();
+        RecipesManager.reset();
+        Config.load();
+    }
+    
     public static boolean hasPermission(CommandSender player, String perm)
     {
         return (URPlugin.permission != null && URPlugin.permission.has(player, perm)) || player.isOp();
