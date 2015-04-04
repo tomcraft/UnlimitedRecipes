@@ -22,7 +22,7 @@ public class URPlugin extends JavaPlugin
     @Override
     public void onEnable()
     {
-        URPlugin.instance = this;        
+        URPlugin.instance = this;
         Config.load();
         UpdateThread.start();
         setupPermissions();
@@ -52,7 +52,8 @@ public class URPlugin extends JavaPlugin
                     return false;
                 }
                 RecipesManager.reset();
-                onEnable();
+                reloadConfig();
+                Config.load();
             }
         }
         return true;
