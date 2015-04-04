@@ -64,14 +64,9 @@ public class URPlugin extends JavaPlugin
         UpdateThread.restart();
     }
     
-    public static boolean hasPermission(CommandSender player, String perm)
+    public static boolean hasPermission(CommandSender sender, String perm)
     {
-        return (URPlugin.permission != null && URPlugin.permission.has(player, perm)) || player.isOp();
-    }
-
-    public static boolean hasPermission(String player, String perm)
-    {
-        return hasPermission(Bukkit.getPlayer(player), perm);
+        return (URPlugin.permission != null && URPlugin.permission.has(sender, perm)) || sender.isOp();
     }
 
     private boolean setupPermissions()

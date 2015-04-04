@@ -33,7 +33,7 @@ public class RecipesListener implements Listener
         
         if ((custRecipe = RecipesManager.getCustomRecipeByRecipe(recipe)) != null)
         {
-            if(custRecipe.usePermission && !URPlugin.hasPermission(e.getView().getPlayer().getName(), custRecipe.permission))
+            if(custRecipe.usePermission && !URPlugin.hasPermission(e.getView().getPlayer(), custRecipe.permission))
             {
                 e.getInventory().setResult(null);
                 return;
