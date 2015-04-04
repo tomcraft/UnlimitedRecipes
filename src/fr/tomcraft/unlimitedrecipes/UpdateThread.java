@@ -8,12 +8,12 @@ import org.bukkit.scheduler.BukkitTask;
 
 public class UpdateThread implements Runnable
 {
-
+    
     public static boolean updateChecking = true;
     public static boolean updateDownloading = false;
     public static boolean updateAvailable = false;
     private static BukkitTask task;
-
+    
     public static void start()
     {
         if (UpdateThread.updateChecking && UpdateThread.task == null)
@@ -21,12 +21,21 @@ public class UpdateThread implements Runnable
             UpdateThread.task = Bukkit.getScheduler().runTaskTimerAsynchronously(URPlugin.instance, new UpdateThread(), 0L, 864000L);
         }
     }
-
+    
     public static void stop()
     {
-        UpdateThread.task.cancel();
+        if(task != null)
+        {
+            UpdateThread.task.cancel();
+        }
     }
-
+    
+    public static void restart()
+    {
+        UpdateThread.stop();
+        UpdateThread.start();
+    }
+    
     public static boolean checkUpdate()
     {
         URPlugin.renewUpdater();
@@ -38,7 +47,7 @@ public class UpdateThread implements Runnable
         }
         return false;
     }
-
+    
     @Override
     public void run()
     {

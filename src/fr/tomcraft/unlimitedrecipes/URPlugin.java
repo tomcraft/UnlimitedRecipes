@@ -24,7 +24,6 @@ public class URPlugin extends JavaPlugin
     {
         URPlugin.instance = this;
         reloadConfig();
-        UpdateThread.start();
         setupPermissions();
         Bukkit.getPluginManager().registerEvents(new RecipesListener(), this);
     }
@@ -62,6 +61,7 @@ public class URPlugin extends JavaPlugin
         super.reloadConfig();
         RecipesManager.reset();
         Config.load();
+        UpdateThread.restart();
     }
     
     public static boolean hasPermission(CommandSender player, String perm)
