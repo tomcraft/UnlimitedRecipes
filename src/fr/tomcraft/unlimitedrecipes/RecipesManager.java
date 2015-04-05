@@ -28,16 +28,16 @@ public class RecipesManager
     {
         if (recipe.type == RecipeType.SHAPED_RECIPE)
         {
-            recipe.ingredients = ((ShapedRecipe)recipe.recipe).getIngredientMap();
+            recipe.ingredients = ((ShapedRecipe)recipe.bukkitRecipe).getIngredientMap();
         }
         RecipesManager.customRecipes.add(recipe);
         
         if(recipe.deleteOthers)
         {
-            unloadBukkitRecipes(recipe.recipe.getResult().getType(), recipe.recipe.getResult().getData().getData());
+            unloadBukkitRecipes(recipe.bukkitRecipe.getResult().getType(), recipe.bukkitRecipe.getResult().getData().getData());
         }
         
-        Bukkit.addRecipe(recipe.recipe);
+        Bukkit.addRecipe(recipe.bukkitRecipe);
     }
     
     public static void unloadBukkitRecipe(Recipe toUnload)
@@ -86,7 +86,8 @@ public class RecipesManager
     {
         for (CustomRecipe cust : RecipesManager.customRecipes)
         {
-            if(!recipe.getResult().getData().equals(cust.recipe.getResult().getData()) || recipe.getResult().getAmount() != cust.recipe.getResult().getAmount())
+                    
+            if(!recipe.getResult().getData().equals(cust.bukkitRecipe.getResult().getData()) || recipe.getResult().getAmount() != cust.bukkitRecipe.getResult().getAmount())
             {
                 continue;
             }
@@ -97,7 +98,7 @@ public class RecipesManager
             }
             else if (recipe instanceof ShapelessRecipe && cust.type == RecipeType.SHAPELESS_RECIPE)
             {
-                ShapelessRecipe custRecipe = ((ShapelessRecipe)cust.recipe);
+                ShapelessRecipe custRecipe = ((ShapelessRecipe)cust.bukkitRecipe);
                 ShapelessRecipe bukkitRecipe = ((ShapelessRecipe)recipe);
                 
                 if(custRecipe.getIngredientList().size() == bukkitRecipe.getIngredientList().size() && custRecipe.getIngredientList().containsAll(bukkitRecipe.getIngredientList()))
@@ -107,7 +108,7 @@ public class RecipesManager
             }
             else if (recipe instanceof FurnaceRecipe && cust.type == RecipeType.FURNACE_RECIPE)
             {
-                if (((FurnaceRecipe)cust.recipe).getInput().equals(((FurnaceRecipe)recipe).getInput()))
+                if (((FurnaceRecipe)cust.bukkitRecipe).getInput().equals(((FurnaceRecipe)recipe).getInput()))
                 {
                     return cust;
                 }
@@ -120,7 +121,7 @@ public class RecipesManager
     {
         for (CustomRecipe cust : RecipesManager.customRecipes)
         {
-            ItemStack its = cust.recipe.getResult();
+            ItemStack its = cust.bukkitRecipe.getResult();
             if ((its.getType().name() + ":" + its.getDurability()).equals(result))
             {
                 return cust;

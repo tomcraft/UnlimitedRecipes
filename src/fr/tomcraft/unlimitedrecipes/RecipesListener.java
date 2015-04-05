@@ -67,7 +67,6 @@ public class RecipesListener implements Listener
                 
                 e.getInventory().setResult(newResult);
             }
-            
         }
     }
     

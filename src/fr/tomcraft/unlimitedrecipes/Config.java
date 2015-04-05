@@ -77,7 +77,7 @@ public class Config
         
         craftingFile = new File(plugin.getDataFolder(), "crafting.yml");
         furnaceFile = new File(plugin.getDataFolder(), "furnace.yml");
-                
+        
         if ( !craftingFile.exists())
         {
             Config.extractFile("crafting.yml");
@@ -239,70 +239,71 @@ public class Config
                 {
                     ConfigurationSection section2 = Config.crafting.getConfigurationSection(key + ".ingredientsID");
                     char c = key2.charAt(0);
-                    byte meta = 0;
+                    byte metaIng = -1;
                     int quantityIng = 1;
-                    Material material;
-                    if (RecipesManager.getCustomRecipeByName(section2.getString(key2)) != null)
+                    Material materialIng;
+                    String readed = section2.getString(key2);
+                    if (RecipesManager.getCustomRecipeByName(readed) != null)
                     {
                         try
                         {
                             if (recipeType == RecipeType.SHAPED_RECIPE)
                             {
-                                ((ShapedRecipe)recipe).setIngredient(c, RecipesManager.getCustomRecipeByName(section2.getString(key2)).recipe.getResult().getData());
+                                ((ShapedRecipe)recipe).setIngredient(c, RecipesManager.getCustomRecipeByName(readed).bukkitRecipe.getResult().getData());
                             }
                             else
                             {
-                                ((ShapelessRecipe)recipe).addIngredient(RecipesManager.getCustomRecipeByName(section2.getString(key2)).recipe.getResult().getData());
+                                ((ShapelessRecipe)recipe).addIngredient(RecipesManager.getCustomRecipeByName(readed).bukkitRecipe.getResult().getData());
                             }
                         }
                         catch (Exception e)
                         {
-                            LOG.severe("[UnlimitedRecipes] Error while adding recipe for: " + toCraft.name() + ":" + metadata);
+                            LOG.severe("[UnlimitedRecipes] Error while adding bukkitRecipe for: " + toCraft.name() + ":" + metadata);
                             e.printStackTrace();
                         }
                     }
                     else
                     {
-                        if (section2.getString(key2).contains(":") && section2.getString(key2).contains("x"))
+                        if (readed.contains(":") && readed.contains("x"))
                         {
-                            meta = Byte.parseByte(section2.getString(key2).split(":")[1].split("x")[0]);
-                            material = getMaterial(section2.getString(key2).split(":")[0]);
-                            quantityIng = Short.parseShort(section2.getString(key2).split("x")[1]);
+                            metaIng = Byte.parseByte(readed.split(":")[1].split("x")[0]);
+                            materialIng = getMaterial(readed.split(":")[0]);
+                            quantityIng = Short.parseShort(readed.split("x")[1]);
                         }
-                        else if (section2.getString(key2).contains(":"))
+                        else if (readed.contains(":"))
                         {
-                            meta = Byte.parseByte(section2.getString(key2).split(":")[1]);
-                            material = getMaterial(section2.getString(key2).split(":")[0]);
+                            metaIng = Byte.parseByte(readed.split(":")[1]);
+                            materialIng = getMaterial(readed.split(":")[0]);
                         }
-                        else if (section2.getString(key2).contains("x"))
+                        else if (readed.contains("x"))
                         {
-                            meta = Byte.parseByte(section2.getString(key2).split("x")[0]);
-                            material = getMaterial(section2.getString(key2).split(":")[0]);
-                            quantityIng = Integer.parseInt(section2.getString(key2).split("x")[1]);
+                            metaIng = Byte.parseByte(readed.split("x")[0]);
+                            materialIng = getMaterial(readed.split(":")[0]);
+                            quantityIng = Integer.parseInt(readed.split("x")[1]);
                         }
                         else
                         {
-                            material = getMaterial(section2.getString(key2));
+                            materialIng = getMaterial(readed);
                         }
                         try
                         {
                             if (recipeType == RecipeType.SHAPED_RECIPE)
                             {
-                                ((ShapedRecipe)recipe).setIngredient(c, material.getNewData(meta));
+                                ((ShapedRecipe)recipe).setIngredient(c, materialIng, metaIng);
                             }
                             else
                             {
-                                ((ShapelessRecipe)recipe).addIngredient(quantityIng, material.getNewData(meta));
+                                ((ShapelessRecipe)recipe).addIngredient(quantityIng, materialIng, metaIng);
                             }
                         }
                         catch (Exception e)
                         {
-                            LOG.severe("[UnlimitedRecipes] Error while adding recipe for: " + toCraft.name() + ":" + metadata);
+                            LOG.severe("[UnlimitedRecipes] Error while adding bukkitRecipe for: " + toCraft.name() + ":" + metadata);
                             e.printStackTrace();
                         }
                     }
                 }
-                custRecipe.recipe = recipe;
+                custRecipe.bukkitRecipe = recipe;
                 RecipesManager.registerRecipe(custRecipe);
                 if(debug)
                 {

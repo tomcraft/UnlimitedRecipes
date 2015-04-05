@@ -10,7 +10,7 @@ public class CustomRecipe
 
     public RecipeType type;
     public String name;
-    public Recipe recipe;
+    public Recipe bukkitRecipe;
     public boolean usePermission;
     public String permission;
     public boolean deleteOthers;
@@ -25,7 +25,7 @@ public class CustomRecipe
     {
         this.type = type;
         this.name = name;
-        this.recipe = recipe;
+        this.bukkitRecipe = recipe;
         this.usePermission = usePermission;
         this.permission = permission;
         this.deleteOthers = deleteOthers;

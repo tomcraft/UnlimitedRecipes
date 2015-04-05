@@ -4,7 +4,7 @@
   <groupId>fr.tomcraft</groupId>
   <artifactId>unlimitedrecipes</artifactId>
   <name>UnlimitedRecipes</name>
-  <version>2.2.7</version>
+  <version>2.2.8-SNAPSHOT</version>
   <url>https://github.com/tomcraft/UnlimitedRecipes</url>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -63,25 +63,15 @@
       <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots</url>
     </repository>
     <repository>
-      <id>milkbowl-repo</id>
-      <url>http://nexus.theyeticave.net/content/repositories/pub_snapshots</url>
-    </repository>
-    <repository>
       <id>gravity-repo</id>
       <url>http://repo.gravitydevelopment.net</url>
     </repository>
   </repositories>
   <dependencies>
     <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>bukkit</artifactId>
-      <version>1.8-R0.1-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.milkbowl.vault</groupId>
-      <artifactId>Vault</artifactId>
-      <version>1.2.26-SNAPSHOT</version>
+      <groupId>org.spigotmc</groupId>
+      <artifactId>spigot-api</artifactId>
+      <version>1.8.3-R0.1-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>
