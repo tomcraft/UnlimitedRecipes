@@ -2,7 +2,7 @@ name: ${project.name}
 main: fr.tomcraft.unlimitedrecipes.URPlugin
 author: Xx_tomcraft_xX
 version: ${project.version}
-depend: [Vault]
+depend: []
 commands:
     ur:
         description: Reload recipes
