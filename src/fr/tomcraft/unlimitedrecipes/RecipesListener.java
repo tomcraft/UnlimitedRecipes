@@ -30,15 +30,13 @@ public class RecipesListener implements Listener
         Recipe recipe = e.getRecipe();
         ItemStack result = recipe.getResult();
         CustomRecipe custRecipe = null;
-        
         if ((custRecipe = RecipesManager.getCustomRecipeByRecipe(recipe)) != null)
         {
-            if(custRecipe.usePermission && !URPlugin.hasPermission(e.getView().getPlayer(), custRecipe.permission))
+            if (custRecipe.usePermission && !URPlugin.hasPermission(e.getView().getPlayer(), custRecipe.permission))
             {
                 e.getInventory().setResult(null);
                 return;
             }
-            
             if (recipe.getResult().getType() == Material.SKULL_ITEM && ((SkullMeta)result.getItemMeta()).getOwner().equalsIgnoreCase("--CrafterHead"))
             {
                 SkullMeta meta = (SkullMeta)result.getItemMeta();
@@ -46,29 +44,22 @@ public class RecipesListener implements Listener
                 result.setItemMeta(meta);
                 e.getInventory().setResult(result);
             }
-            
-            if(custRecipe.transferDurability)
+            if (custRecipe.transferDurability)
             {
-                float totalDurability = 0;
-                float totalMaxDurability = 0;
-                
-                for(ItemStack its : e.getInventory().getMatrix())
+                float rendment = 1F;
+                for (ItemStack its : e.getInventory().getMatrix())
                 {
-                    if(its != null && !its.getType().isBlock() && its.getType().getMaxDurability() > 16)
+                    if (its != null && its != e.getInventory().getResult() && !its.getType().isBlock() && its.getType() != Material.INK_SACK && its.getType().getMaxDurability() != 0)
                     {
-                        totalDurability =+ its.getDurability();
-                        totalMaxDurability =+ its.getType().getMaxDurability();
+                        float displayDura = its.getType().getMaxDurability() - its.getDurability();
+                        rendment = rendment * (displayDura / its.getType().getMaxDurability());
                     }
                 }
-                
-                short newDurability = (short)((totalDurability / totalMaxDurability) * (float)result.getType().getMaxDurability());
+                short newDurability = (short)(rendment * result.getType().getMaxDurability());
                 ItemStack newResult = result.clone();
-                newResult.setDurability(newDurability);
-                
+                newResult.setDurability((short)(result.getType().getMaxDurability() - newDurability));
                 e.getInventory().setResult(newResult);
             }
         }
     }
-    
-    
 }

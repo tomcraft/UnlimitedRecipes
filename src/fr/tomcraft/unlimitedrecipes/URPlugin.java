@@ -12,10 +12,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class URPlugin extends JavaPlugin
 {
-
+    
     public static URPlugin instance;
     public static Updater updater;
-
+    
     @Override
     public void onEnable()
     {
@@ -23,17 +23,17 @@ public class URPlugin extends JavaPlugin
         reloadConfig();
         Bukkit.getPluginManager().registerEvents(new RecipesListener(), this);
     }
-
+    
     public FileConfiguration getCraftingConfig()
     {
         return Config.crafting;
     }
-
+    
     public FileConfiguration getFurnaceConfig()
     {
         return Config.furnace;
     }
-
+    
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
     {
@@ -51,7 +51,8 @@ public class URPlugin extends JavaPlugin
         }
         return true;
     }
-
+    
+    @Override
     public void reloadConfig()
     {
         super.reloadConfig();
@@ -64,7 +65,7 @@ public class URPlugin extends JavaPlugin
     {
         return sender.hasPermission(perm) || sender.isOp();
     }
-
+    
     public static void renewUpdater()
     {
         URPlugin.updater = new Updater(URPlugin.instance, 52907, URPlugin.instance.getFile(), UpdateThread.updateDownloading ? UpdateType.DEFAULT : UpdateType.NO_DOWNLOAD, false);

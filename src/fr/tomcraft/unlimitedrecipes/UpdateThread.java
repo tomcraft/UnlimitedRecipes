@@ -24,7 +24,7 @@ public class UpdateThread implements Runnable
     
     public static void stop()
     {
-        if(task != null)
+        if (UpdateThread.task != null)
         {
             UpdateThread.task.cancel();
         }
@@ -53,5 +53,4 @@ public class UpdateThread implements Runnable
     {
         UpdateThread.updateAvailable = UpdateThread.checkUpdate();
     }
-    
 }

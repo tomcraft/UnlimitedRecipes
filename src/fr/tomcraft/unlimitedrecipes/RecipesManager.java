@@ -15,15 +15,15 @@ import fr.tomcraft.unlimitedrecipes.CustomRecipe.RecipeType;
 
 public class RecipesManager
 {
-
+    
     public static ArrayList<CustomRecipe> customRecipes = new ArrayList<CustomRecipe>();
     
     public static void reset()
     {
         Bukkit.resetRecipes();
-        customRecipes = new ArrayList<CustomRecipe>();
+        RecipesManager.customRecipes = new ArrayList<CustomRecipe>();
     }
-
+    
     public static void registerRecipe(CustomRecipe recipe)
     {
         if (recipe.type == RecipeType.SHAPED_RECIPE)
@@ -31,12 +31,10 @@ public class RecipesManager
             recipe.ingredients = ((ShapedRecipe)recipe.bukkitRecipe).getIngredientMap();
         }
         RecipesManager.customRecipes.add(recipe);
-        
-        if(recipe.deleteOthers)
+        if (recipe.deleteOthers)
         {
-            unloadBukkitRecipes(recipe.bukkitRecipe.getResult().getType(), recipe.bukkitRecipe.getResult().getData().getData());
+            RecipesManager.unloadBukkitRecipes(recipe.bukkitRecipe.getResult().getType(), recipe.bukkitRecipe.getResult().getData().getData());
         }
-        
         Bukkit.addRecipe(recipe.bukkitRecipe);
     }
     
@@ -44,10 +42,10 @@ public class RecipesManager
     {
         Iterator<Recipe> it = Bukkit.recipeIterator();
         Recipe recipe;
-        while(it.hasNext())
+        while (it.hasNext())
         {
             recipe = it.next();
-            if (recipe != null && !isCustomRecipe(recipe) && recipe.equals(toUnload))
+            if (recipe != null && !RecipesManager.isCustomRecipe(recipe) && recipe.equals(toUnload))
             {
                 it.remove();
             }
@@ -58,10 +56,10 @@ public class RecipesManager
     {
         Iterator<Recipe> it = Bukkit.recipeIterator();
         Recipe recipe;
-        while(it.hasNext())
+        while (it.hasNext())
         {
             recipe = it.next();
-            if (recipe != null && !isCustomRecipe(recipe) && recipe.getResult().getType().equals(toUnload))
+            if (recipe != null && !RecipesManager.isCustomRecipe(recipe) && recipe.getResult().getType().equals(toUnload))
             {
                 it.remove();
             }
@@ -72,36 +70,33 @@ public class RecipesManager
     {
         Iterator<Recipe> it = Bukkit.recipeIterator();
         Recipe recipe;
-        while(it.hasNext())
+        while (it.hasNext())
         {
             recipe = it.next();
-            if (recipe != null && !isCustomRecipe(recipe) && recipe.getResult().getType().equals(toUnload) && recipe.getResult().getData().getData() == data)
+            if (recipe != null && !RecipesManager.isCustomRecipe(recipe) && recipe.getResult().getType().equals(toUnload) && recipe.getResult().getData().getData() == data)
             {
                 it.remove();
             }
         }
     }
-
+    
     public static CustomRecipe getCustomRecipeByRecipe(Recipe recipe)
     {
         for (CustomRecipe cust : RecipesManager.customRecipes)
         {
-                    
-            if(!recipe.getResult().getData().equals(cust.bukkitRecipe.getResult().getData()) || recipe.getResult().getAmount() != cust.bukkitRecipe.getResult().getAmount())
+            if (!recipe.getResult().getData().equals(cust.bukkitRecipe.getResult().getData()) || recipe.getResult().getAmount() != cust.bukkitRecipe.getResult().getAmount())
             {
                 continue;
             }
-            
             if (recipe instanceof ShapedRecipe && cust.type == RecipeType.SHAPED_RECIPE)
-            {                
+            {
                 return cust;
             }
             else if (recipe instanceof ShapelessRecipe && cust.type == RecipeType.SHAPELESS_RECIPE)
             {
-                ShapelessRecipe custRecipe = ((ShapelessRecipe)cust.bukkitRecipe);
-                ShapelessRecipe bukkitRecipe = ((ShapelessRecipe)recipe);
-                
-                if(custRecipe.getIngredientList().size() == bukkitRecipe.getIngredientList().size() && custRecipe.getIngredientList().containsAll(bukkitRecipe.getIngredientList()))
+                ShapelessRecipe custRecipe = (ShapelessRecipe)cust.bukkitRecipe;
+                ShapelessRecipe bukkitRecipe = (ShapelessRecipe)recipe;
+                if (custRecipe.getIngredientList().size() == bukkitRecipe.getIngredientList().size() && custRecipe.getIngredientList().containsAll(bukkitRecipe.getIngredientList()))
                 {
                     return cust;
                 }
@@ -116,7 +111,7 @@ public class RecipesManager
         }
         return null;
     }
-
+    
     public static CustomRecipe getCustomRecipeByResult(String result)
     {
         for (CustomRecipe cust : RecipesManager.customRecipes)
@@ -129,7 +124,7 @@ public class RecipesManager
         }
         return null;
     }
-
+    
     public static CustomRecipe getCustomRecipeByName(String name)
     {
         for (CustomRecipe cust : RecipesManager.customRecipes)
@@ -141,7 +136,7 @@ public class RecipesManager
         }
         return null;
     }
-
+    
     public static boolean isCustomRecipe(Recipe recipe)
     {
         return RecipesManager.getCustomRecipeByRecipe(recipe) != null;

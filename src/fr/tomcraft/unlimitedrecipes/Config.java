@@ -32,13 +32,11 @@ import fr.tomcraft.unlimitedrecipes.CustomRecipe.RecipeType;
 
 public class Config
 {
+    
     private static Logger LOG = Logger.getLogger("Minecraft.UnlimitedRecipes");
-    
     public static boolean debug = false;
-    
     public static File craftingFile;
     public static File furnaceFile;
-    
     public static FileConfiguration defaultConfig;
     public static FileConfiguration crafting;
     public static FileConfiguration furnace;
@@ -55,12 +53,10 @@ public class Config
     {
         URPlugin plugin = URPlugin.instance;
         Config.defaultConfig = plugin.getConfig();
-        
-        if ( !plugin.getDataFolder().exists())
+        if (!plugin.getDataFolder().exists())
         {
             plugin.getDataFolder().mkdirs();
         }
-        
         if (!new File(plugin.getDataFolder(), "config.yml").exists())
         {
             Config.defaultConfig.set("enableUpdateChecking", true);
@@ -69,25 +65,21 @@ public class Config
             Config.defaultConfig.set("debug", false);
             plugin.saveConfig();
         }
-        
-        debug = Config.defaultConfig.getBoolean("debug");
-        
+        Config.debug = Config.defaultConfig.getBoolean("debug");
         UpdateThread.updateChecking = Config.defaultConfig.getBoolean("enableUpdateChecking");
         UpdateThread.updateDownloading = Config.defaultConfig.getBoolean("enableUpdateDownloading");
-        
-        craftingFile = new File(plugin.getDataFolder(), "crafting.yml");
-        furnaceFile = new File(plugin.getDataFolder(), "furnace.yml");
-        
-        if ( !craftingFile.exists())
+        Config.craftingFile = new File(plugin.getDataFolder(), "crafting.yml");
+        Config.furnaceFile = new File(plugin.getDataFolder(), "furnace.yml");
+        if (!Config.craftingFile.exists())
         {
             Config.extractFile("crafting.yml");
         }
-        if ( !furnaceFile.exists())
+        if (!Config.furnaceFile.exists())
         {
             Config.extractFile("furnace.yml");
         }
-        Config.crafting = YamlConfiguration.loadConfiguration(craftingFile);
-        Config.furnace = YamlConfiguration.loadConfiguration(furnaceFile);
+        Config.crafting = YamlConfiguration.loadConfiguration(Config.craftingFile);
+        Config.furnace = YamlConfiguration.loadConfiguration(Config.furnaceFile);
     }
     
     private static boolean isInt(String obj)
@@ -96,7 +88,8 @@ public class Config
         {
             Integer.parseInt(obj);
             return true;
-        }catch(Exception e)
+        }
+        catch (Exception e)
         {
             return false;
         }
@@ -104,7 +97,7 @@ public class Config
     
     private static Material getMaterial(String obj)
     {
-        if(isInt(obj))
+        if (Config.isInt(obj))
         {
             return Material.getMaterial(Integer.parseInt(obj));
         }
@@ -119,39 +112,35 @@ public class Config
         if (Config.defaultConfig.getStringList("blacklisted_items") != null)
         {
             List<String> blackListedItems = Config.defaultConfig.getStringList("blacklisted_items");
-            
-            if(blackListedItems.isEmpty())
+            if (blackListedItems.isEmpty())
             {
                 return;
             }
-            
-            for(String item: blackListedItems)
+            for (String item : blackListedItems)
             {
                 Material mat = null;
                 byte data = -1;
-                
-                if(item.contains(":"))
+                if (item.contains(":"))
                 {
-                    mat = getMaterial(item.split(":")[0]);
+                    mat = Config.getMaterial(item.split(":")[0]);
                     data = Byte.parseByte(item.split(":")[1]);
                     RecipesManager.unloadBukkitRecipes(mat, data);
-                    if(debug)
+                    if (Config.debug)
                     {
-                        LOG.info("[UnlimitedRecipes] All recipes for " + mat.name() + ":" + data + " were deleted !");
+                        Config.LOG.info("[UnlimitedRecipes] All recipes for " + mat.name() + ":" + data + " were deleted !");
                     }
                 }
                 else
                 {
-                    mat = getMaterial(item);
+                    mat = Config.getMaterial(item);
                     RecipesManager.unloadBukkitRecipes(mat);
-                    if(debug)
+                    if (Config.debug)
                     {
-                        LOG.info("[UnlimitedRecipes] All recipes for " + mat.name() + " were deleted !");
+                        Config.LOG.info("[UnlimitedRecipes] All recipes for " + mat.name() + " were deleted !");
                     }
                 }
             }
-            
-            LOG.info("[UnlimitedRecipes] Recipes were deleted ! (" + blackListedItems.size() + " items)");
+            Config.LOG.info("[UnlimitedRecipes] Recipes were deleted ! (" + blackListedItems.size() + " items)");
         }
     }
     
@@ -160,16 +149,14 @@ public class Config
         if (Config.crafting.getConfigurationSection("config.crafts") != null)
         {
             Set<String> keys = Config.crafting.getConfigurationSection("config.crafts").getKeys(false);
-            
-            if(keys == null || keys.isEmpty())
+            if (keys == null || keys.isEmpty())
             {
                 return;
             }
-            
             for (String name : keys)
             {
                 String key = "config.crafts." + name;
-                Material toCraft = getMaterial(Config.crafting.getString(key + ".itemID"));
+                Material toCraft = Config.getMaterial(Config.crafting.getString(key + ".itemID"));
                 Object metad = Config.crafting.get(key + ".metadata");
                 int quantity = Config.crafting.getInt(key + ".quantity");
                 List<String> enchants = Config.crafting.getStringList(key + ".enchantments");
@@ -178,13 +165,11 @@ public class Config
                 boolean deleteOthers = Config.crafting.getBoolean(key + ".deleteOthers");
                 boolean transferDurability = Config.crafting.getBoolean(key + ".transferDurability");
                 boolean usePermission = Config.crafting.getBoolean(key + ".usePermission");
-                String customName = color(Config.crafting.getString(key + ".customName"));
-                
+                String customName = Config.color(Config.crafting.getString(key + ".customName"));
                 short metadata = 0;
                 String permission = "ur.craft." + name;
                 ItemStack shpedre;
-                
-                if (metad instanceof String && (toCraft == Material.SKULL_ITEM))
+                if (metad instanceof String && toCraft == Material.SKULL_ITEM)
                 {
                     shpedre = new ItemStack(toCraft, quantity, (short)3);
                     SkullMeta meta = (SkullMeta)shpedre.getItemMeta();
@@ -204,13 +189,9 @@ public class Config
                     metadata = (short)Config.crafting.getInt(key + ".metadata");
                     shpedre = new ItemStack(toCraft, quantity, metadata);
                 }
-                
-                applyCustomName(shpedre, customName);
-                
-                applyLores(shpedre, lores);
-                
-                applyEnchants(shpedre, enchants);
-                
+                Config.applyCustomName(shpedre, customName);
+                Config.applyLores(shpedre, lores);
+                Config.applyEnchants(shpedre, enchants);
                 Recipe recipe = new ShapedRecipe(shpedre);
                 if (recipeType == RecipeType.SHAPELESS_RECIPE)
                 {
@@ -233,7 +214,6 @@ public class Config
                     }
                     ((ShapedRecipe)recipe).shape(shape);
                 }
-                
                 Set<String> keys2 = Config.crafting.getConfigurationSection(key + ".ingredientsID").getKeys(false);
                 for (String key2 : keys2)
                 {
@@ -258,7 +238,7 @@ public class Config
                         }
                         catch (Exception e)
                         {
-                            LOG.severe("[UnlimitedRecipes] Error while adding bukkitRecipe for: " + toCraft.name() + ":" + metadata);
+                            Config.LOG.severe("[UnlimitedRecipes] Error while adding bukkitRecipe for: " + toCraft.name() + ":" + metadata);
                             e.printStackTrace();
                         }
                     }
@@ -267,23 +247,23 @@ public class Config
                         if (readed.contains(":") && readed.contains("x"))
                         {
                             metaIng = Byte.parseByte(readed.split(":")[1].split("x")[0]);
-                            materialIng = getMaterial(readed.split(":")[0]);
+                            materialIng = Config.getMaterial(readed.split(":")[0]);
                             quantityIng = Short.parseShort(readed.split("x")[1]);
                         }
                         else if (readed.contains(":"))
                         {
                             metaIng = Byte.parseByte(readed.split(":")[1]);
-                            materialIng = getMaterial(readed.split(":")[0]);
+                            materialIng = Config.getMaterial(readed.split(":")[0]);
                         }
                         else if (readed.contains("x"))
                         {
                             metaIng = Byte.parseByte(readed.split("x")[0]);
-                            materialIng = getMaterial(readed.split(":")[0]);
+                            materialIng = Config.getMaterial(readed.split(":")[0]);
                             quantityIng = Integer.parseInt(readed.split("x")[1]);
                         }
                         else
                         {
-                            materialIng = getMaterial(readed);
+                            materialIng = Config.getMaterial(readed);
                         }
                         try
                         {
@@ -298,19 +278,19 @@ public class Config
                         }
                         catch (Exception e)
                         {
-                            LOG.severe("[UnlimitedRecipes] Error while adding bukkitRecipe for: " + toCraft.name() + ":" + metadata);
+                            Config.LOG.severe("[UnlimitedRecipes] Error while adding bukkitRecipe for: " + toCraft.name() + ":" + metadata);
                             e.printStackTrace();
                         }
                     }
                 }
                 custRecipe.bukkitRecipe = recipe;
                 RecipesManager.registerRecipe(custRecipe);
-                if(debug)
+                if (Config.debug)
                 {
-                    LOG.info("[UnlimitedRecipes] Crafting Recipe for: " + toCraft.name() + ":" + metadata + " added !");
+                    Config.LOG.info("[UnlimitedRecipes] Crafting Recipe for: " + toCraft.name() + ":" + metadata + " added !");
                 }
             }
-            LOG.info("[UnlimitedRecipes] All craft recipes loaded ! ("+keys.size() + " recipes)");
+            Config.LOG.info("[UnlimitedRecipes] All craft recipes loaded ! (" + keys.size() + " recipes)");
         }
     }
     
@@ -319,32 +299,30 @@ public class Config
         if (Config.furnace.getConfigurationSection("config.smelts") != null)
         {
             Set<String> keys = Config.furnace.getConfigurationSection("config.smelts").getKeys(false);
-            
-            if(keys == null || keys.isEmpty())
+            if (keys == null || keys.isEmpty())
             {
                 return;
             }
-            
             for (String name : keys)
             {
                 String key = "config.smelts." + name;
-                Material material = getMaterial(Config.furnace.getString(key + ".resultID"));
+                Material material = Config.getMaterial(Config.furnace.getString(key + ".resultID"));
                 byte metaResult = (byte)Config.furnace.getInt(key + ".result_MetaData");
                 String customName = Config.furnace.getString(key + ".result_customName");
                 List<String> lores = Config.furnace.getStringList(key + ".result_lores");
-                Material ingredient = getMaterial(Config.furnace.getString(key + ".ingredientID"));
+                Material ingredient = Config.getMaterial(Config.furnace.getString(key + ".ingredientID"));
                 Config.furnace.getInt(key + ".ingredient_MetaData");
                 ItemStack shpedre = new ItemStack(material, 1, metaResult);
-                applyCustomName(shpedre, customName);
-                applyLores(shpedre, lores);
+                Config.applyCustomName(shpedre, customName);
+                Config.applyLores(shpedre, lores);
                 FurnaceRecipe recipe = new FurnaceRecipe(shpedre, ingredient.getNewData(metaResult));
                 RecipesManager.registerRecipe(new CustomRecipe(RecipeType.FURNACE_RECIPE, name, recipe, false, null, false, false));
-                if(debug)
+                if (Config.debug)
                 {
-                    LOG.info("[UnlimitedRecipes] Furnace Recipe for: " + material.name() + ":" + metaResult + " added !");
+                    Config.LOG.info("[UnlimitedRecipes] Furnace Recipe for: " + material.name() + ":" + metaResult + " added !");
                 }
             }
-            LOG.info("[UnlimitedRecipes] All smelt recipes loaded ! ("+keys.size() + " recipes)");
+            Config.LOG.info("[UnlimitedRecipes] All smelt recipes loaded ! (" + keys.size() + " recipes)");
         }
     }
     
@@ -359,7 +337,7 @@ public class Config
         {
             for (String str : enchants)
             {
-                its.addUnsafeEnchantment(getEnchantment(str.split(":")[0]), Integer.valueOf(str.split(":")[1]));
+                its.addUnsafeEnchantment(Config.getEnchantment(str.split(":")[0]), Integer.valueOf(str.split(":")[1]));
             }
         }
     }
@@ -371,7 +349,7 @@ public class Config
             List<String> lstmp = new ArrayList<String>();
             for (String s : lores)
             {
-                lstmp.add(ChatColor.RESET + color(s));
+                lstmp.add(ChatColor.RESET + Config.color(s));
             }
             ItemMeta tmp = its.getItemMeta();
             tmp.setLore(lstmp);
@@ -384,14 +362,14 @@ public class Config
         if (name != null)
         {
             ItemMeta tmp = its.getItemMeta();
-            tmp.setDisplayName(ChatColor.RESET + color(name));
+            tmp.setDisplayName(ChatColor.RESET + Config.color(name));
             its.setItemMeta(tmp);
         }
     }
     
     private static Enchantment getEnchantment(String obj)
     {
-        if(isInt(obj))
+        if (Config.isInt(obj))
         {
             return Enchantment.getById(Integer.valueOf(obj));
         }
@@ -406,7 +384,7 @@ public class Config
         try
         {
             URPlugin.instance.getDataFolder().mkdirs();
-            Config.crafting.save(craftingFile);
+            Config.crafting.save(Config.craftingFile);
         }
         catch (IOException e)
         {
@@ -419,7 +397,7 @@ public class Config
         try
         {
             URPlugin.instance.getDataFolder().mkdirs();
-            Config.furnace.save(furnaceFile);
+            Config.furnace.save(Config.furnaceFile);
         }
         catch (IOException e)
         {
