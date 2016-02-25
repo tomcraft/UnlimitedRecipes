@@ -187,6 +187,8 @@ public class RecipesListener implements Listener
         Player p = (Player)e.getView().getPlayer();
         if(URPlugin.craftMaking.containsKey(p.getName()))
         {
+            e.getPlayer().getInventory().addItem(e.getView().getTopInventory().getContents());
+            e.getView().getTopInventory().clear();
             URPlugin.craftMaking.remove(p.getName());
         }
         if(URPlugin.craftViewers.containsKey(p.getName()))
