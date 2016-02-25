@@ -1,6 +1,6 @@
 package fr.tomcraft.unlimitedrecipes;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.bukkit.Bukkit;
@@ -8,113 +8,119 @@ import org.bukkit.Material;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
-
-import fr.tomcraft.unlimitedrecipes.CustomRecipe.RecipeType;
 
 public class RecipesManager
 {
     
-    public static ArrayList<CustomRecipe> customRecipes = new ArrayList<CustomRecipe>();
+    public static HashMap<String, URecipe> customRecipes = new HashMap<String, URecipe>();
     
     public static void reset()
     {
         Bukkit.resetRecipes();
-        RecipesManager.customRecipes = new ArrayList<CustomRecipe>();
+        RecipesManager.customRecipes.clear();
     }
     
-    public static void registerRecipe(CustomRecipe recipe)
+    public static void reload()
     {
-        if (recipe.type == RecipeType.SHAPED_RECIPE)
-        {
-            recipe.ingredients = ((ShapedRecipe)recipe.bukkitRecipe).getIngredientMap();
-        }
-        RecipesManager.customRecipes.add(recipe);
-        if (recipe.deleteOthers)
-        {
-            RecipesManager.unloadBukkitRecipes(recipe.bukkitRecipe.getResult().getType(), recipe.bukkitRecipe.getResult().getData().getData());
-        }
-        Bukkit.addRecipe(recipe.bukkitRecipe);
+        Bukkit.resetRecipes();
+        registerRecipes();
     }
     
-    public static void unloadBukkitRecipe(Recipe toUnload)
+    public static void registerRecipes()
+    {
+        for(URecipe recipe : customRecipes.values())
+        {
+            if(recipe.disableOthers())
+            {
+                ItemStack its = recipe.getResult();
+                unloadBukkitRecipes(its.getType(), its.getDurability());
+                if(Config.debug)
+                {
+                    Config.LOG.info("[UnlimitedRecipes] Disabled all recipes for: " + its.getType() + ":" + its.getDurability() + " !");
+                }
+            }
+        }
+        for(URecipe recipe : customRecipes.values())
+        {
+            Bukkit.addRecipe(recipe.getBukkitRecipe());
+        }
+        
+        Config.LOG.info("[UnlimitedRecipes] All recipes were loaded ! (" + customRecipes.size() + " recipes)");
+    }
+    
+    public static void unloadBukkitRecipes(Material material, Short data)
     {
         Iterator<Recipe> it = Bukkit.recipeIterator();
         Recipe recipe;
         while (it.hasNext())
         {
             recipe = it.next();
-            if (recipe != null && !RecipesManager.isCustomRecipe(recipe) && recipe.equals(toUnload))
+            ItemStack item = recipe.getResult();
+            if (recipe != null && item.getType() == material && (data != null ? item.getDurability() == data : true))
             {
                 it.remove();
             }
         }
     }
     
-    public static void unloadBukkitRecipes(Material toUnload)
-    {
-        Iterator<Recipe> it = Bukkit.recipeIterator();
-        Recipe recipe;
-        while (it.hasNext())
-        {
-            recipe = it.next();
-            if (recipe != null && !RecipesManager.isCustomRecipe(recipe) && recipe.getResult().getType().equals(toUnload))
-            {
-                it.remove();
-            }
-        }
-    }
     
-    public static void unloadBukkitRecipes(Material toUnload, byte data)
+    public static URecipe getURecipeByRecipe(Recipe recipe)
     {
-        Iterator<Recipe> it = Bukkit.recipeIterator();
-        Recipe recipe;
-        while (it.hasNext())
+        for (URecipe custRecipe : RecipesManager.customRecipes.values())
         {
-            recipe = it.next();
-            if (recipe != null && !RecipesManager.isCustomRecipe(recipe) && recipe.getResult().getType().equals(toUnload) && recipe.getResult().getData().getData() == data)
+            if(custRecipe.getBukkitRecipe().equals(recipe))
             {
-                it.remove();
+                return custRecipe;
             }
-        }
-    }
-    
-    public static CustomRecipe getCustomRecipeByRecipe(Recipe recipe)
-    {
-        for (CustomRecipe cust : RecipesManager.customRecipes)
-        {
-            if (!recipe.getResult().getData().equals(cust.bukkitRecipe.getResult().getData()) || recipe.getResult().getAmount() != cust.bukkitRecipe.getResult().getAmount())
+            
+            if(!custRecipe.getType().getType().isAssignableFrom(recipe.getClass()))
             {
                 continue;
             }
-            if (recipe instanceof ShapedRecipe && cust.type == RecipeType.SHAPED_RECIPE)
+            
+            if (!recipe.getResult().isSimilar(custRecipe.getResult()))
             {
-                return cust;
+                continue;
             }
-            else if (recipe instanceof ShapelessRecipe && cust.type == RecipeType.SHAPELESS_RECIPE)
+            
+            if (recipe instanceof ShapelessRecipe)
             {
-                ShapelessRecipe custRecipe = (ShapelessRecipe)cust.bukkitRecipe;
+                ShapelessRecipe uRecipe = (ShapelessRecipe)custRecipe.getBukkitRecipe();
                 ShapelessRecipe bukkitRecipe = (ShapelessRecipe)recipe;
-                if (custRecipe.getIngredientList().size() == bukkitRecipe.getIngredientList().size() && custRecipe.getIngredientList().containsAll(bukkitRecipe.getIngredientList()))
+                if (uRecipe.getIngredientList().size() != bukkitRecipe.getIngredientList().size())
                 {
-                    return cust;
+                    continue;
+                }
+                if (!uRecipe.getIngredientList().containsAll(bukkitRecipe.getIngredientList()))
+                {
+                    continue;
                 }
             }
-            else if (recipe instanceof FurnaceRecipe && cust.type == RecipeType.FURNACE_RECIPE)
+            else if (recipe instanceof FurnaceRecipe)
             {
-                if (((FurnaceRecipe)cust.bukkitRecipe).getInput().equals(((FurnaceRecipe)recipe).getInput()))
+                FurnaceRecipe uRecipe = (FurnaceRecipe)custRecipe.getBukkitRecipe();
+                FurnaceRecipe bukkitRecipe = (FurnaceRecipe)recipe;
+                if (!uRecipe.getInput().isSimilar(bukkitRecipe.getInput()))
                 {
-                    return cust;
+                    continue;
                 }
             }
+            
+            return custRecipe;
         }
         return null;
     }
     
-    public static CustomRecipe getCustomRecipeByResult(String result)
+    public static URecipe getURecipeByName(String name)
     {
-        for (CustomRecipe cust : RecipesManager.customRecipes)
+        return customRecipes.get(name);
+    }
+    
+    /*
+    public static URecipe getCustomRecipeByResult(String result)
+    {
+        for (URecipe cust : RecipesManager.customRecipes)
         {
             ItemStack its = cust.bukkitRecipe.getResult();
             if ((its.getType().name() + ":" + its.getDurability()).equals(result))
@@ -125,9 +131,9 @@ public class RecipesManager
         return null;
     }
     
-    public static CustomRecipe getCustomRecipeByName(String name)
+    public static URecipe getCustomRecipeByName(String name)
     {
-        for (CustomRecipe cust : RecipesManager.customRecipes)
+        for (URecipe cust : RecipesManager.customRecipes)
         {
             if (cust.name.equalsIgnoreCase(name))
             {
@@ -140,5 +146,5 @@ public class RecipesManager
     public static boolean isCustomRecipe(Recipe recipe)
     {
         return RecipesManager.getCustomRecipeByRecipe(recipe) != null;
-    }
+    }*/
 }
