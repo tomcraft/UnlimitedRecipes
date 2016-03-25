@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import fr.tomcraft.unlimitedrecipes.URecipe.RecipeType;
@@ -217,16 +218,43 @@ public class RecipesListener implements Listener
                 e.getInventory().setResult(null);
                 return;
             }
-            if (recipe.getResult().getType() == Material.SKULL_ITEM)
+            
+            if(result.hasItemMeta())
             {
-                SkullMeta meta = (SkullMeta)result.getItemMeta();
-                if(meta.getOwner().equalsIgnoreCase("%player%"))
+                String playerName = e.getView().getPlayer().getName();
+                ItemMeta meta = result.getItemMeta();
+                
+                if(meta.hasDisplayName() && meta.getDisplayName().contains("%player%"))
                 {
-                    meta.setOwner(e.getView().getPlayer().getName());
+                    meta.setDisplayName(meta.getDisplayName().replace("%player%", playerName));
+                }
+                
+                if(meta.hasLore())
+                {
+                    ArrayList<String> lores = new ArrayList<String>();
+                    for(String lore : meta.getLore())
+                    {
+                        lores.add(lore.replace("%player%", playerName));
+                    }
+                    meta.setLore(lores);
+                }
+                
+                if (recipe.getResult().getType() == Material.SKULL_ITEM)
+                {
+                    SkullMeta skullMeta = (SkullMeta)result.getItemMeta();
+                    if(skullMeta.getOwner().equalsIgnoreCase("%player%"))
+                    {
+                        skullMeta.setOwner(playerName);
+                    }
+                }
+                
+                if(result.getItemMeta() != meta)
+                {
                     result.setItemMeta(meta);
                     e.getInventory().setResult(result);
                 }
             }
+            
             if (custRecipe.transferDamage())
             {
                 float rendment = 1F;

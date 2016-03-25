@@ -62,8 +62,8 @@ public class URPlugin extends JavaPlugin
         if (args.length == 0 || args[0].equalsIgnoreCase("help"))
         {
             int help = args.length >= 2 ? Integer.parseInt(args[1]) : 1;
-            sender.sendMessage(ChatColor.GOLD + "---------- UnlimitedRecipes Help page "+help + "/3 ----------");
-            sender.sendMessage(ChatColor.GOLD + "Commands needs you have the concerned item in your hand");
+            sender.sendMessage(ChatColor.GOLD + "---------- UnlimitedRecipes Help page "+help + "/4 ----------");
+            sender.sendMessage(ChatColor.GOLD + "Commands needs you have the RESULT item in your hand");
             if(help == 1)
             {
                 sender.sendMessage(ChatColor.RED + "Usage: /ur reload");
@@ -72,26 +72,35 @@ public class URPlugin extends JavaPlugin
                 sender.sendMessage(ChatColor.RED + "Usage: /ur list");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur view <name>");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur delete <name>");
-                sender.sendMessage(ChatColor.RED + "Usage: /ur item rename <name>" + ChatColor.GRAY + " (put _ for space)");
             }
             else if(help == 2)
             {
-                sender.sendMessage(ChatColor.RED + "Usage: /ur item lore add <line>" + ChatColor.GRAY + " (put _ for space)");
+                sender.sendMessage(ChatColor.GRAY + "In a text put %player% to include the player name");
+                sender.sendMessage(ChatColor.GRAY + "In a text put _ to make a space");
+                sender.sendMessage(ChatColor.RED + "Usage: /ur item rename <name>");
+                sender.sendMessage(ChatColor.RED + "Usage: /ur item lore add <line>");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur item lore reset");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur item enchant add <enchant> <level>");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur item enchant list");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur item enchant reset");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur item unbreakable <true/false>");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur item skull <ownerName or %player%>");
-                sender.sendMessage(ChatColor.RED + "Usage: /ur item flag hide attributes <true/false>");
             }
             else if(help == 3)
             {
+                sender.sendMessage(ChatColor.RED + "Usage: /ur item flag hide attributes <true/false>");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur item flag hide destroys <true/false>");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur item flag hide enchants <true/false>");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur item flag hide potion_effects <true/false>");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur item flag hide placed_on <true/false>");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur item flag hide unbreakable <true/false>");
+            }
+            else if(help == 4)
+            {
+                sender.sendMessage(ChatColor.RED + "Usage: /ur blacklist <on/off>");
+                sender.sendMessage(ChatColor.RED + "Usage: /ur blacklist add [useData] (true or false)");
+                sender.sendMessage(ChatColor.RED + "Usage: /ur blacklist delete");
+                sender.sendMessage(ChatColor.RED + "Usage: /ur blacklist list");
             }
             
             return false;
@@ -133,15 +142,15 @@ public class URPlugin extends JavaPlugin
             CraftingInventory inv = ((CraftingInventory)iv.getTopInventory());
             craftViewers.put(p.getName(), uRecipe);
             
-            if(uRecipe.getType() == RecipeType.SHAPELESS_RECIPE) 
+            if(recipe instanceof ShapelessRecipe) 
             {
                 ShapelessRecipe sls = (ShapelessRecipe)recipe;
                 int i = 1;
-                for(ItemStack its : sls.getIngredientList()) 
+                for(ItemStack item : sls.getIngredientList()) 
                 {
-                    if(its != null)
+                    if(item != null)
                     {
-                        ItemStack fixedItem = its.clone();
+                        ItemStack fixedItem = item.clone();
                         if(fixedItem.getDurability() == Short.MAX_VALUE)
                         {
                             fixedItem.setDurability((short)0);
@@ -150,8 +159,7 @@ public class URPlugin extends JavaPlugin
                     }
                     i++;
                 }
-            }
-            else if(uRecipe.getType() == RecipeType.SHAPED_RECIPE)
+            } else 
             {
                 ShapedRecipe sd = (ShapedRecipe)recipe;
                 int y = 0;
@@ -160,9 +168,10 @@ public class URPlugin extends JavaPlugin
                 {
                     while(!s.equals("")) 
                     {
-                        if(sd.getIngredientMap().get(s.charAt(0)) != null)
+                        ItemStack item = sd.getIngredientMap().get(s.charAt(0));
+                        if(item != null)
                         {
-                            ItemStack fixedItem = sd.getIngredientMap().get(s.charAt(0)).clone();
+                            ItemStack fixedItem = item.clone();
                             if(fixedItem.getDurability() == Short.MAX_VALUE)
                             {
                                 fixedItem.setDurability((short)0);
@@ -184,6 +193,64 @@ public class URPlugin extends JavaPlugin
             Config.save();
             RecipesManager.reload();
             sender.sendMessage(ChatColor.GREEN + "Recipe deleted !");
+            return true;
+        }
+        else if(action.equalsIgnoreCase("blacklist") && args.length >= 2 && hasPermission(sender, "ur.blacklist"))
+        {
+            action = args[1];
+            boolean useData = args.length >= 3 ? Boolean.parseBoolean(args[2]) : true;
+            Player p = (Player)sender;
+            ItemStack item = p.getItemInHand();
+            ArrayList<String> blackList = new ArrayList<String>(getConfig().getStringList("blacklisted_items"));
+            
+            if(action.equalsIgnoreCase("on"))
+            {
+                getConfig().set("enableBlackList", true);
+                sender.sendMessage(ChatColor.GREEN + "Done");
+            }
+            else if(action.equalsIgnoreCase("off"))
+            {
+                getConfig().set("enableBlackList", false);
+                sender.sendMessage(ChatColor.GREEN + "Done");
+            }
+            else if(action.equalsIgnoreCase("add"))
+            {
+                blackList.add(item.getType() + (useData ? ":" + item.getData().getData() : ""));
+                sender.sendMessage(ChatColor.GREEN + "Recipe blacklisted !");
+            }
+            else if(action.equalsIgnoreCase("remove"))
+            {
+                for(String s : new ArrayList<String>(blackList))
+                {
+                    blackList.remove(s);
+                }
+                sender.sendMessage(ChatColor.GREEN + "Recipe unblacklisted !");
+            }
+            else if(action.equalsIgnoreCase("list"))
+            {
+                for(String s : blackList)
+                {
+                    p.sendMessage(ChatColor.GREEN + " - " + s);
+                }
+                sender.sendMessage(ChatColor.GREEN + "Done");
+            }
+            
+            getConfig().set("blacklisted_items", blackList);
+            saveConfig();
+            
+            RecipesManager.reload();
+            return true;
+        }
+        else if(action.equalsIgnoreCase("hide") && args.length >= 3 && hasPermission(sender, "ur.hide"))
+        {
+            action = args[1];
+            boolean hide = args.length >= 4 ? Boolean.parseBoolean(args[3]) : true;
+            
+            RecipesManager.getURecipeByName(args[2]).setHiden(hide);
+            
+            Config.save();
+            RecipesManager.reload();
+            sender.sendMessage(ChatColor.GREEN + "Done");
             return true;
         }
         else if(action.equalsIgnoreCase("item") && args.length >= 2 && hasPermission(sender, "ur.item"))
