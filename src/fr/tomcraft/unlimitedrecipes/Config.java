@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -42,6 +41,7 @@ public class Config
     
     public static void save()
     {
+        URPlugin.instance.saveConfig();
         saveCraftingRecipes();
         saveFurnaceRecipes();
     }
@@ -70,31 +70,6 @@ public class Config
         furnace = YamlConfiguration.loadConfiguration(furnaceFile);
         UpdateThread.updateChecking = defaultConfig.getBoolean("enableUpdateChecking");
         UpdateThread.updateDownloading = defaultConfig.getBoolean("enableUpdateDownloading");
-    }
-    
-    private static boolean isInt(String obj)
-    {
-        try
-        {
-            Integer.parseInt(obj);
-            return true;
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
-    }
-    
-    public static Material getMaterial(String obj)
-    {
-        if (Config.isInt(obj))
-        {
-            return Material.getMaterial(Integer.parseInt(obj));
-        }
-        else
-        {
-            return Material.getMaterial(obj.toUpperCase());
-        }
     }
     
     public static void loadBlackListedRecipes()

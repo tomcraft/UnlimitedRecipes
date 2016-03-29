@@ -224,7 +224,7 @@ public class URPlugin extends JavaPlugin
             {
                 for(String s : new ArrayList<String>(blackList))
                 {
-                    Material mat = Config.getMaterial(s.split(":")[0]);
+                    Material mat = Material.matchMaterial(s.split(":")[0]);
                     byte data = s.contains(":") ? Byte.parseByte(s.split(":")[1]) : -1;
                     
                     if(mat != item.getType() || s.contains(":") && data != item.getData().getData())
@@ -393,7 +393,7 @@ public class URPlugin extends JavaPlugin
             else if(args.length >= 4)
             {
                 String content = args[3];
-                Material material = Config.getMaterial(content.contains(":") ? content.split(":")[0] : content);
+                Material material = Material.matchMaterial(content.contains(":") ? content.split(":")[0] : content);
                 short data = Short.parseShort((content.contains(":") ? content.split(":")[1] : "-1"));
                 ItemStack input = new ItemStack(material, 1, data);
                 

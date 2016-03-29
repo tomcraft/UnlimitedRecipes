@@ -36,7 +36,7 @@ public class RecipesManager
         {
             Material mat = null;
             Short data = null;
-            mat = Config.getMaterial(item.split(":")[0]);
+            mat = Material.matchMaterial(item.split(":")[0]);
             data = item.contains(":") ? Short.parseShort(item.split(":")[1]) : null;
             RecipesManager.unloadBukkitRecipes(mat, data);
             if (Config.debug)
