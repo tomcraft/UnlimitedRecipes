@@ -41,6 +41,7 @@ public class RecipesListener implements Listener
     public void onPlayerInventoryClick(InventoryClickEvent e)
     {
         Player p = (Player)e.getView().getPlayer();
+        ItemStack result = p.getItemInHand();
         
         if(URPlugin.craftViewers.containsKey(p.getName()))
         {
@@ -57,6 +58,11 @@ public class RecipesListener implements Listener
         
         if(e.getSlot() == 17)
         {
+            if(result == null || result.getType() == Material.AIR)
+            {
+                e.setCancelled(true);
+                return;
+            }
             char[] az = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
             HashMap<ItemStack, Character> itsToChar = new HashMap<ItemStack, Character>();
             HashMap<Character, ItemStack> charToIts = new HashMap<Character, ItemStack>();
@@ -65,7 +71,7 @@ public class RecipesListener implements Listener
             
             if(uRecipe.getType() == RecipeType.SHAPED_RECIPE)
             {
-                ShapedRecipe recipe = new ShapedRecipe(p.getItemInHand());
+                ShapedRecipe recipe = new ShapedRecipe(result);
                 String[] shape = {"", "", ""};
                 
                 for(int i = 0; i < 9; i++)
@@ -150,7 +156,7 @@ public class RecipesListener implements Listener
             }
             else if(uRecipe.getType() == RecipeType.SHAPELESS_RECIPE)
             {
-                ShapelessRecipe recipe = new ShapelessRecipe(p.getItemInHand());
+                ShapelessRecipe recipe = new ShapelessRecipe(result);
                 
                 int i = 0;
                 for(ItemStack its : inv.getMatrix())
@@ -185,7 +191,7 @@ public class RecipesListener implements Listener
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e)
     {
-        Player p = (Player)e.getView().getPlayer();
+        Player p = (Player)e.getPlayer();
         if(URPlugin.craftMaking.containsKey(p.getName()))
         {
             e.getPlayer().getInventory().addItem(e.getView().getTopInventory().getContents());

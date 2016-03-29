@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.tomcraft</groupId>
 	<artifactId>UnlimitedRecipes</artifactId>
-	<version>3.1</version>
+	<version>3.1.2</version>
 	<name>UnlimitedRecipes</name>
 	<url>https://github.com/tomcraft/UnlimitedRecipes</url>
 	<properties>

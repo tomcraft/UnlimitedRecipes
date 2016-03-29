@@ -4,7 +4,7 @@
   <groupId>fr.tomcraft</groupId>
   <artifactId>UnlimitedRecipes</artifactId>
   <name>UnlimitedRecipes</name>
-  <version>3.1</version>
+  <version>3.1.2</version>
   <url>https://github.com/tomcraft/UnlimitedRecipes</url>
   <build>
     <sourceDirectory>src</sourceDirectory>

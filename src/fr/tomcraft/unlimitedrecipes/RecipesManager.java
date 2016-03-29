@@ -1,5 +1,6 @@
 package fr.tomcraft.unlimitedrecipes;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -14,6 +15,7 @@ public class RecipesManager
 {
     
     public static HashMap<String, URecipe> customRecipes = new HashMap<String, URecipe>();
+    public static ArrayList<String> blacklist = new ArrayList<String>();
     
     public static void reset()
     {
@@ -24,7 +26,25 @@ public class RecipesManager
     public static void reload()
     {
         Bukkit.resetRecipes();
+        registerBlacklist();
         registerRecipes();
+    }
+    
+    public static void registerBlacklist()
+    {
+        for (String item : blacklist)
+        {
+            Material mat = null;
+            Short data = null;
+            mat = Config.getMaterial(item.split(":")[0]);
+            data = item.contains(":") ? Short.parseShort(item.split(":")[1]) : null;
+            RecipesManager.unloadBukkitRecipes(mat, data);
+            if (Config.debug)
+            {
+                Config.LOG.info("[UnlimitedRecipes] All recipes for " + mat.name() + ":" + data + " were deleted !");
+            }
+        }
+        Config.LOG.info("[UnlimitedRecipes] Recipes were deleted ! (" + blacklist.size() + " items)");
     }
     
     public static void registerRecipes()

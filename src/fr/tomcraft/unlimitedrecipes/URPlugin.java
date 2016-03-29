@@ -1,6 +1,7 @@
 package fr.tomcraft.unlimitedrecipes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,6 +22,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -34,7 +36,7 @@ public class URPlugin extends JavaPlugin
     
     public static URPlugin instance;
     public static Updater updater;
-
+    
     public static HashMap<String, URecipe> craftMaking = new HashMap<String, URecipe>();
     public static HashMap<String, URecipe> craftViewers = new HashMap<String, URecipe>();
     
@@ -63,12 +65,12 @@ public class URPlugin extends JavaPlugin
         {
             int help = args.length >= 2 ? Integer.parseInt(args[1]) : 1;
             sender.sendMessage(ChatColor.GOLD + "---------- UnlimitedRecipes Help page "+help + "/4 ----------");
-            sender.sendMessage(ChatColor.GOLD + "Commands needs you have the RESULT item in your hand");
+            sender.sendMessage(ChatColor.GOLD + "Commands needs you to have the RESULT item in your hand");
             if(help == 1)
             {
                 sender.sendMessage(ChatColor.RED + "Usage: /ur reload");
-                sender.sendMessage(ChatColor.RED + "Usage: /ur create <name> furnace <input[:data]> [disableOthers]");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur create <name> <shaped/shapeless> [enablePermission] [disableOthers] [transfertDurability]");
+                sender.sendMessage(ChatColor.RED + "Usage: /ur create <name> furnace <input[:data]> [disableOthers]");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur list");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur view <name>");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur delete <name>");
@@ -201,7 +203,7 @@ public class URPlugin extends JavaPlugin
             boolean useData = args.length >= 3 ? Boolean.parseBoolean(args[2]) : true;
             Player p = (Player)sender;
             ItemStack item = p.getItemInHand();
-            ArrayList<String> blackList = new ArrayList<String>(getConfig().getStringList("blacklisted_items"));
+            ArrayList<String> blackList = RecipesManager.blacklist;
             
             if(action.equalsIgnoreCase("on"))
             {
@@ -222,6 +224,14 @@ public class URPlugin extends JavaPlugin
             {
                 for(String s : new ArrayList<String>(blackList))
                 {
+                    Material mat = Config.getMaterial(s.split(":")[0]);
+                    byte data = s.contains(":") ? Byte.parseByte(s.split(":")[1]) : -1;
+                    
+                    if(mat != item.getType() || s.contains(":") && data != item.getData().getData())
+                    {
+                        continue;
+                    }
+                    
                     blackList.remove(s);
                 }
                 sender.sendMessage(ChatColor.GREEN + "Recipe unblacklisted !");
@@ -235,8 +245,8 @@ public class URPlugin extends JavaPlugin
                 sender.sendMessage(ChatColor.GREEN + "Done");
             }
             
-            getConfig().set("blacklisted_items", blackList);
-            saveConfig();
+            RecipesManager.blacklist = blackList;
+            Config.saveBlacklist();
             
             RecipesManager.reload();
             return true;
@@ -287,13 +297,17 @@ public class URPlugin extends JavaPlugin
                 if(e == null)
                 {
                     p.sendMessage(ChatColor.RED + "Invalid enchantment !");
+                    return false;
                 }
                 int level = Integer.parseInt(args[4]);
-                if(level < e.getStartLevel() || level > e.getMaxLevel())
+                if(meta instanceof EnchantmentStorageMeta)
                 {
-                    p.sendMessage(ChatColor.RED + "Invalid level ! ("+e.getStartLevel() + "-" + e.getMaxLevel()+")");
+                    ((EnchantmentStorageMeta)meta).addStoredEnchant(e, level, true);
                 }
-                meta.addEnchant(e, level, true);
+                else
+                {
+                    meta.addEnchant(e, level, true);
+                }
             }
             else if(action.equalsIgnoreCase("enchant") && args.length >= 3 && args[2].equalsIgnoreCase("list"))
             {
@@ -348,6 +362,14 @@ public class URPlugin extends JavaPlugin
         else if(action.equalsIgnoreCase("create") && args.length >= 3 && hasPermission(sender, "ur.create"))
         {
             Player p = (Player)sender;
+            ItemStack result = p.getItemInHand();
+            
+            if(result == null || result.getType() == Material.AIR)
+            {
+                p.sendMessage(ChatColor.RED + "You must have the result item in your hand !");
+                return false;
+            }
+            
             RecipeType type = RecipeType.fromName(args[2]);
             URecipe recipe = new URecipe(null, type);
             recipe.setName(args[1]);
@@ -362,6 +384,7 @@ public class URPlugin extends JavaPlugin
                 ItemStack wool = new ItemStack(Material.WOOL, 1, DyeColor.LIME.getWoolData());
                 ItemMeta meta = wool.getItemMeta();
                 meta.setDisplayName(ChatColor.GREEN + "Save recipe");
+                meta.setLore(Arrays.asList(ChatColor.RED + "You must have the result item in your hand !"));
                 wool.setItemMeta(meta);
                 p.getInventory().setItem(17, wool);
                 
@@ -374,11 +397,11 @@ public class URPlugin extends JavaPlugin
                 short data = Short.parseShort((content.contains(":") ? content.split(":")[1] : "-1"));
                 ItemStack input = new ItemStack(material, 1, data);
                 
-                FurnaceRecipe bukkitRecipe = new FurnaceRecipe(p.getItemInHand(), input.getData());
+                FurnaceRecipe bukkitRecipe = new FurnaceRecipe(result, input.getData());
                 
                 if(data == -1)
                 {
-                    bukkitRecipe = new FurnaceRecipe(p.getItemInHand(), material);
+                    bukkitRecipe = new FurnaceRecipe(result, material);
                 }
                 
                 recipe.setBukkitRecipe(bukkitRecipe);

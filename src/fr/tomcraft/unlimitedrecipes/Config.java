@@ -59,7 +59,7 @@ public class Config
             defaultConfig.set("enableUpdateChecking", true);
             defaultConfig.set("enableUpdateDownloading", false);
             defaultConfig.set("enableBlackList", false);
-            defaultConfig.set("blacklisted_items", Arrays.asList("STONE:0", "WORKBENCH", "61"));
+            defaultConfig.set("blacklisted_items", Arrays.asList(""));
             defaultConfig.set("debug", false);
             plugin.saveConfig();
         }
@@ -106,32 +106,14 @@ public class Config
         List<String> blackListedItems = defaultConfig.getStringList("blacklisted_items");
         if (blackListedItems != null && !blackListedItems.isEmpty())
         {
-            for (String item : blackListedItems)
-            {
-                Material mat = null;
-                short data = -1;
-                if (item.contains(":"))
-                {
-                    mat = Config.getMaterial(item.split(":")[0]);
-                    data = Short.parseShort(item.split(":")[1]);
-                    RecipesManager.unloadBukkitRecipes(mat, data);
-                    if (Config.debug)
-                    {
-                        Config.LOG.info("[UnlimitedRecipes] All recipes for " + mat.name() + ":" + data + " were deleted !");
-                    }
-                }
-                else
-                {
-                    mat = Config.getMaterial(item);
-                    RecipesManager.unloadBukkitRecipes(mat, (Short)null);
-                    if (Config.debug)
-                    {
-                        Config.LOG.info("[UnlimitedRecipes] All recipes for " + mat.name() + " were deleted !");
-                    }
-                }
-            }
-            Config.LOG.info("[UnlimitedRecipes] Recipes were deleted ! (" + blackListedItems.size() + " items)");
+            RecipesManager.blacklist.addAll(blackListedItems);
         }
+    }
+    
+    public static void saveBlacklist()
+    {
+        URPlugin.instance.getConfig().set("blacklisted_items", RecipesManager.blacklist);
+        URPlugin.instance.saveConfig();
     }
     
     public static void loadCraftingRecipes()
