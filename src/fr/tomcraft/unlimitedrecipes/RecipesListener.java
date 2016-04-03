@@ -4,17 +4,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.CraftingInventory;
+import org.bukkit.inventory.FurnaceRecipe;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
@@ -27,6 +33,8 @@ import fr.tomcraft.unlimitedrecipes.URecipe.RecipeType;
 public class RecipesListener implements Listener
 {
     
+    static int saveSlot = 17;
+    
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent e)
     {
@@ -38,10 +46,10 @@ public class RecipesListener implements Listener
     }
     
     @EventHandler
-    public void onPlayerInventoryClick(InventoryClickEvent e)
+    public void onPlayerInventoryClick(final InventoryClickEvent e)
     {
-        Player p = (Player)e.getView().getPlayer();
-        ItemStack result = p.getItemInHand();
+        final Player p = (Player)e.getView().getPlayer();
+        final Inventory inventory = e.getView().getTopInventory();
         
         if(URPlugin.craftViewers.containsKey(p.getName()))
         {
@@ -56,135 +64,197 @@ public class RecipesListener implements Listener
         
         URecipe uRecipe = URPlugin.craftMaking.get(p.getName());
         
-        if(e.getSlot() == 17)
+        if(e.getSlotType() == SlotType.RESULT)
         {
+            ItemStack newResult = e.getCursor() != null && e.getCursor().getType() != Material.AIR ? e.getCursor().clone() : null;
+            ItemStack newCursor = e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR ? e.getCurrentItem().clone() : null;
+            
+            if(newCursor != null && newResult != null && newResult.isSimilar(newCursor))
+            {
+                newResult.setAmount(newResult.getAmount() + newCursor.getAmount());
+                newCursor = null;
+            }
+            
+            p.setItemOnCursor(newCursor);
+            inventory.setItem(e.getSlot(), newResult);
+            if(Arrays.asList(InventoryAction.PICKUP_ALL, InventoryAction.PLACE_ALL, InventoryAction.PLACE_ONE).contains(e.getAction()))
+            {
+                URPlugin.craftMakingResultTMP.put(p.getName(), newResult);
+            }
+            e.setCancelled(true);
+            return;
+        }
+        
+        if(e.getSlotType() == SlotType.FUEL)
+        {
+            inventory.setItem(e.getSlot(), e.getCurrentItem()); 
+            e.setCancelled(true);
+            return;
+        }
+        
+        ItemStack result = null;
+        
+        if(e.getSlot() == saveSlot)
+        {   
+            result = uRecipe.getType() == RecipeType.FURNACE_RECIPE ? inventory.getItem(2) : inventory.getItem(0);
+            
             if(result == null || result.getType() == Material.AIR)
             {
+                p.sendMessage(ChatColor.RED + "Error: The result slot is empty !");
                 e.setCancelled(true);
                 return;
             }
-            char[] az = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
-            HashMap<ItemStack, Character> itsToChar = new HashMap<ItemStack, Character>();
-            HashMap<Character, ItemStack> charToIts = new HashMap<Character, ItemStack>();
             
-            CraftingInventory inv = (CraftingInventory)e.getView().getTopInventory();
-            
-            if(uRecipe.getType() == RecipeType.SHAPED_RECIPE)
+            if(uRecipe.getType() == RecipeType.FURNACE_RECIPE)
             {
-                ShapedRecipe recipe = new ShapedRecipe(result);
-                String[] shape = {"", "", ""};
                 
-                for(int i = 0; i < 9; i++)
-                {
-                    ItemStack its = inv.getMatrix()[i];
-                    char c = its == null || its.getType() == Material.AIR ? ' ' : itsToChar.containsKey(its) ? itsToChar.get(its) : az[i];
-                    itsToChar.put(its, c);
-                    charToIts.put(c, its);
-                    
-                    shape[i/3] += c;           
-                }
-                
-                ArrayList<String> shapeList = new ArrayList<String>(Arrays.asList(shape));
-                for(int i=0;i<shapeList.size();i++)
-                {
-                    if(shapeList.get(i).trim().isEmpty())
-                    {
-                        shapeList.remove(i);
-                        i--;
-                    }
-                }
-                
-                shapeList.trimToSize();
-                
-                for(int i=0;i<3;i++)
-                {
-                    boolean need = true;
-                    for(String line : shapeList)
-                    {
-                        if(!line.startsWith(" "))
-                        {
-                            need = false;
-                        }
-                    }
-                    if(need)
-                    {
-                        for(int j=0;j<shapeList.size();j++)
-                        {
-                            String line = shapeList.get(j);
-                            shapeList.set(j, line.substring(1));
-                        }
-                    }
-                    need = true;
-                    for(String line : shapeList)
-                    {
-                        if(!line.endsWith(" "))
-                        {
-                            need = false;
-                        }
-                    }
-                    if(need)
-                    {
-                        for(int j=0;j<shapeList.size();j++)
-                        {
-                            String line = shapeList.get(j);
-                            shapeList.set(j, line.substring(0, line.length()-1));
-                        }
-                    }
-                }
-                
-                shape = new String[shapeList.size()];
-                recipe.shape(shapeList.toArray(shape));
-                
-                for(char cc : charToIts.keySet())
-                {
-                    if(cc == ' ')
-                    {
-                        continue;
-                    }
-                    ItemStack ing = charToIts.get(cc);
-                    if(ing.getDurability() != -1)
-                    {
-                        recipe.setIngredient(cc, ing.getData());
-                    }
-                    else
-                    {
-                        recipe.setIngredient(cc, ing.getType());
-                    }
-                }
-                
+                FurnaceRecipe recipe = new FurnaceRecipe(result, inventory.getItem(0).getData());
                 uRecipe.setBukkitRecipe(recipe);
             }
-            else if(uRecipe.getType() == RecipeType.SHAPELESS_RECIPE)
+            else
             {
-                ShapelessRecipe recipe = new ShapelessRecipe(result);
+                char[] az = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+                HashMap<ItemStack, Character> itsToChar = new HashMap<ItemStack, Character>();
+                HashMap<Character, ItemStack> charToIts = new HashMap<Character, ItemStack>();
                 
-                int i = 0;
-                for(ItemStack its : inv.getMatrix())
+                CraftingInventory inv = (CraftingInventory)e.getView().getTopInventory();
+                
+                if(uRecipe.getType() == RecipeType.SHAPED_RECIPE)
                 {
-                    if(its != null && its.getType() != Material.AIR && its != inv.getResult())
+                    ShapedRecipe recipe = new ShapedRecipe(result);
+                    String[] shape = {"", "", ""};
+                    
+                    for(int i = 0; i < 9; i++)
                     {
-                        itsToChar.put(its, az[i]);
-                        if(its.getDurability() != -1)
+                        ItemStack its = inv.getMatrix()[i];
+                        char c = its == null || its.getType() == Material.AIR ? ' ' : itsToChar.containsKey(its) ? itsToChar.get(its) : az[i];
+                        
+                        if(c != ' ')
                         {
-                            recipe.addIngredient(its.getAmount(), its.getData());
+                            itsToChar.put(its, c);
+                            charToIts.put(c, its);
+                        }
+                        
+                        shape[i/3] += c;           
+                    }
+                    
+                    ArrayList<String> shapeList = new ArrayList<String>(Arrays.asList(shape));
+                    for(int i=0;i<shapeList.size();i++)
+                    {
+                        if(shapeList.get(i).trim().isEmpty())
+                        {
+                            shapeList.remove(i);
+                            i--;
+                        }
+                    }
+                    
+                    shapeList.trimToSize();
+                    
+                    for(int i=0;i<3;i++)
+                    {
+                        boolean need = true;
+                        for(String line : shapeList)
+                        {
+                            if(!line.startsWith(" "))
+                            {
+                                need = false;
+                            }
+                        }
+                        if(need)
+                        {
+                            for(int j=0;j<shapeList.size();j++)
+                            {
+                                String line = shapeList.get(j);
+                                shapeList.set(j, line.substring(1));
+                            }
+                        }
+                        need = true;
+                        for(String line : shapeList)
+                        {
+                            if(!line.endsWith(" "))
+                            {
+                                need = false;
+                            }
+                        }
+                        if(need)
+                        {
+                            for(int j=0;j<shapeList.size();j++)
+                            {
+                                String line = shapeList.get(j);
+                                shapeList.set(j, line.substring(0, line.length()-1));
+                            }
+                        }
+                    }
+                    
+                    shape = new String[shapeList.size()];
+                    
+                    try
+                    {
+                        recipe.shape(shapeList.toArray(shape));
+                    }
+                    catch(Exception ex)
+                    {
+                        p.sendMessage(ChatColor.RED + "Error: Invalid shape !");
+                        e.setCancelled(true);
+                        return;
+                    }
+                    
+                    for(char cc : charToIts.keySet())
+                    {
+                        if(cc == ' ')
+                        {
+                            continue;
+                        }
+                        ItemStack ing = charToIts.get(cc);
+                        if(ing.getDurability() != -1)
+                        {
+                            recipe.setIngredient(cc, ing.getData());
                         }
                         else
                         {
-                            recipe.addIngredient(its.getAmount(), its.getType());
+                            recipe.setIngredient(cc, ing.getType());
                         }
-                        i++;
                     }
+                    
+                    uRecipe.setBukkitRecipe(recipe);
                 }
-                
-                uRecipe.setBukkitRecipe(recipe);
+                else if(uRecipe.getType() == RecipeType.SHAPELESS_RECIPE)
+                {
+                    ShapelessRecipe recipe = new ShapelessRecipe(result);
+                    
+                    int i = 0;
+                    for(ItemStack its : inv.getMatrix())
+                    {
+                        if(its != null && its.getType() != Material.AIR && its != inv.getResult())
+                        {
+                            itsToChar.put(its, az[i]);
+                            if(its.getDurability() != -1)
+                            {
+                                recipe.addIngredient(its.getAmount(), its.getData());
+                            }
+                            else
+                            {
+                                recipe.addIngredient(its.getAmount(), its.getType());
+                            }
+                            i++;
+                        }
+                    }
+                    if(recipe.getIngredientList().isEmpty())
+                    {
+                        p.sendMessage(ChatColor.RED + "Error: Invalid recipe !");
+                        e.setCancelled(true);
+                        return;
+                    }
+                    uRecipe.setBukkitRecipe(recipe);
+                }
             }
+            
             uRecipe.load();
             Config.save();
             RecipesManager.reload();
-            p.sendMessage(ChatColor.GREEN + "Success !");
+            p.sendMessage(ChatColor.GREEN + "Saved recipe successfuly !");
             
             p.closeInventory();
-            p.getInventory().setItem(17, null);
         }
     }
     
@@ -196,7 +266,9 @@ public class RecipesListener implements Listener
         {
             e.getPlayer().getInventory().addItem(e.getView().getTopInventory().getContents());
             e.getView().getTopInventory().clear();
+            e.getPlayer().getInventory().setItem(saveSlot, null);
             URPlugin.craftMaking.remove(p.getName());
+            URPlugin.craftMakingResultTMP.remove(p.getName());
         }
         if(URPlugin.craftViewers.containsKey(p.getName()))
         {
@@ -206,10 +278,33 @@ public class RecipesListener implements Listener
     }
     
     @EventHandler
-    public void onPlayerCraftEvent(PrepareItemCraftEvent e)
+    public void onPlayerCraftEvent(CraftItemEvent e)
     {
         if(URPlugin.craftMaking.containsKey(e.getView().getPlayer().getName()))
         {
+            e.setCancelled(true);
+        }
+    }
+    
+    @EventHandler
+    public void onPlayerPrepareCraftEvent(final PrepareItemCraftEvent e)
+    {
+        if(URPlugin.craftMaking.containsKey(e.getView().getPlayer().getName()))
+        {
+            final ItemStack its = e.getInventory().getResult().clone();
+            
+            ((Player)e.getViewers().get(0)).updateInventory();
+            
+            Bukkit.getScheduler().runTaskLater(URPlugin.instance, new Runnable()
+            {
+                
+                @Override
+                public void run()
+                {
+                    e.getInventory().setResult(its);
+                }
+            }, 10);
+            
             return;
         }
         

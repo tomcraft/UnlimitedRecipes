@@ -14,8 +14,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.CraftingInventory;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.FurnaceRecipe;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -36,8 +37,10 @@ public class URPlugin extends JavaPlugin
     
     public static URPlugin instance;
     public static Updater updater;
-    
+
     public static HashMap<String, URecipe> craftMaking = new HashMap<String, URecipe>();
+    public static HashMap<String, ItemStack> craftMakingResultTMP = new HashMap<String, ItemStack>();
+    
     public static HashMap<String, URecipe> craftViewers = new HashMap<String, URecipe>();
     
     @Override
@@ -65,18 +68,21 @@ public class URPlugin extends JavaPlugin
         {
             int help = args.length >= 2 ? Integer.parseInt(args[1]) : 1;
             sender.sendMessage(ChatColor.GOLD + "---------- UnlimitedRecipes Help page "+help + "/4 ----------");
-            sender.sendMessage(ChatColor.GOLD + "Commands needs you to have the RESULT item in your hand");
             if(help == 1)
             {
-                sender.sendMessage(ChatColor.RED + "Usage: /ur reload");
-                sender.sendMessage(ChatColor.RED + "Usage: /ur create <name> <shaped/shapeless> [enablePermission] [disableOthers] [transfertDurability]");
-                sender.sendMessage(ChatColor.RED + "Usage: /ur create <name> furnace <input[:data]> [disableOthers]");
+                sender.sendMessage(ChatColor.RED + "Usage: /ur create <name> <shaped/shapeless> [disableOthers] [enablePermission] [transfertDurability]");
+                sender.sendMessage(ChatColor.RED + "Usage: /ur create <name> furnace [disableOthers]");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur list");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur view <name>");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur delete <name>");
+                sender.sendMessage(ChatColor.RED + "Usage: /ur blacklist <on/off>");
+                sender.sendMessage(ChatColor.RED + "Usage: /ur blacklist add [useData] (true or false)");
+                sender.sendMessage(ChatColor.RED + "Usage: /ur blacklist delete");
+                sender.sendMessage(ChatColor.RED + "Usage: /ur blacklist list");
             }
             else if(help == 2)
             {
+                sender.sendMessage(ChatColor.GOLD + "Commands needs you to have the RESULT item in your hand");
                 sender.sendMessage(ChatColor.GRAY + "In a text put %player% to include the player name");
                 sender.sendMessage(ChatColor.GRAY + "In a text put _ to make a space");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur item rename <name>");
@@ -90,6 +96,7 @@ public class URPlugin extends JavaPlugin
             }
             else if(help == 3)
             {
+                sender.sendMessage(ChatColor.GOLD + "Commands needs you to have the RESULT item in your hand");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur item flag hide attributes <true/false>");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur item flag hide destroys <true/false>");
                 sender.sendMessage(ChatColor.RED + "Usage: /ur item flag hide enchants <true/false>");
@@ -99,10 +106,7 @@ public class URPlugin extends JavaPlugin
             }
             else if(help == 4)
             {
-                sender.sendMessage(ChatColor.RED + "Usage: /ur blacklist <on/off>");
-                sender.sendMessage(ChatColor.RED + "Usage: /ur blacklist add [useData] (true or false)");
-                sender.sendMessage(ChatColor.RED + "Usage: /ur blacklist delete");
-                sender.sendMessage(ChatColor.RED + "Usage: /ur blacklist list");
+                sender.sendMessage(ChatColor.RED + "Usage: /ur reload");
             }
             
             return false;
@@ -126,7 +130,7 @@ public class URPlugin extends JavaPlugin
         }
         else if(action.equalsIgnoreCase("view") && args.length >= 2 && hasPermission(sender, "ur.view"))
         {
-            Player p = (Player)sender;
+            final Player p = (Player)sender;
             URecipe uRecipe = RecipesManager.customRecipes.get(args[1]);
             if(uRecipe == null)
             {
@@ -134,17 +138,18 @@ public class URPlugin extends JavaPlugin
                 return false;
             }
             Recipe recipe = uRecipe.getBukkitRecipe();
-            
-            if(uRecipe.getType() == RecipeType.FURNACE_RECIPE)
-            {
-                p.sendMessage(ChatColor.RED + "Smelt "+ChatColor.GREEN+((FurnaceRecipe)recipe).getInput().getType().name().toLowerCase() + ChatColor.RED + ".");
-                return true;
-            }
-            InventoryView iv = p.openWorkbench(p.getLocation(), true);
-            CraftingInventory inv = ((CraftingInventory)iv.getTopInventory());
+            InventoryView iv = recipe instanceof FurnaceRecipe ? p.openInventory(Bukkit.createInventory(p, InventoryType.FURNACE)) : p.openWorkbench(p.getLocation(), true);
+            Inventory inv = iv.getTopInventory();
             craftViewers.put(p.getName(), uRecipe);
             
-            if(recipe instanceof ShapelessRecipe) 
+            if(recipe instanceof FurnaceRecipe)
+            {
+                FurnaceRecipe frecipe = (FurnaceRecipe)recipe;
+                inv.setItem(0, frecipe.getInput());
+                inv.setItem(2, frecipe.getResult());
+                inv.setItem(1, new ItemStack(Material.COAL));
+            }
+            else if(recipe instanceof ShapelessRecipe) 
             {
                 ShapelessRecipe sls = (ShapelessRecipe)recipe;
                 int i = 1;
@@ -161,7 +166,9 @@ public class URPlugin extends JavaPlugin
                     }
                     i++;
                 }
-            } else 
+                inv.setItem(0, recipe.getResult());
+            }
+            else 
             {
                 ShapedRecipe sd = (ShapedRecipe)recipe;
                 int y = 0;
@@ -186,7 +193,19 @@ public class URPlugin extends JavaPlugin
                     z = 1;
                     y = y+3;
                 }
+                inv.setItem(0, recipe.getResult());
             }
+            
+            Bukkit.getScheduler().runTaskLater(instance, new Runnable()
+            {
+                
+                @Override
+                public void run()
+                {
+                    p.updateInventory();
+                }
+            }, 15);
+            
             return true;
         }
         else if(action.equalsIgnoreCase("delete") && args.length >= 2 && hasPermission(sender, "ur.delete"))
@@ -361,58 +380,48 @@ public class URPlugin extends JavaPlugin
         }
         else if(action.equalsIgnoreCase("create") && args.length >= 3 && hasPermission(sender, "ur.create"))
         {
-            Player p = (Player)sender;
-            ItemStack result = p.getItemInHand();
-            
-            if(result == null || result.getType() == Material.AIR)
-            {
-                p.sendMessage(ChatColor.RED + "You must have the result item in your hand !");
-                return false;
-            }
+            final Player p = (Player)sender;
             
             RecipeType type = RecipeType.fromName(args[2]);
             URecipe recipe = new URecipe(null, type);
             recipe.setName(args[1]);
             
+            recipe.setDisableOthers(args.length >= 4 ? Boolean.parseBoolean(args[3]) : false);
+            recipe.setEnablePermission(args.length >= 5 ? Boolean.parseBoolean(args[4]) : false);
+            recipe.setTransferDamage(args.length >= 6 ? Boolean.parseBoolean(args[5]) : false);
+            craftMaking.put(p.getName(), recipe);
+            
+            ItemStack wool = new ItemStack(Material.WOOL, 1, DyeColor.LIME.getWoolData());
+            ItemMeta meta = wool.getItemMeta();
+            meta.setDisplayName(ChatColor.GREEN + "Save recipe");
+            meta.setLore(Arrays.asList(ChatColor.RED + "The result slot could not be empty !"));
+            wool.setItemMeta(meta);
+            p.getInventory().setItem(RecipesListener.saveSlot, wool);
+            
             if(type != RecipeType.FURNACE_RECIPE)
             {
-                recipe.setEnablePermission(args.length >= 4 ? Boolean.parseBoolean(args[3]) : false);
-                recipe.setDisableOthers(args.length >= 5 ? Boolean.parseBoolean(args[4]) : false);
-                recipe.setTransferDamage(args.length >= 6 ? Boolean.parseBoolean(args[5]) : false);
-                craftMaking.put(p.getName(), recipe);
-                
-                ItemStack wool = new ItemStack(Material.WOOL, 1, DyeColor.LIME.getWoolData());
-                ItemMeta meta = wool.getItemMeta();
-                meta.setDisplayName(ChatColor.GREEN + "Save recipe");
-                meta.setLore(Arrays.asList(ChatColor.RED + "You must have the result item in your hand !"));
-                wool.setItemMeta(meta);
-                p.getInventory().setItem(17, wool);
-                
                 p.openWorkbench(p.getLocation(), true);
+                new ResfreshTask(p).runTaskTimer(this, 0, 5);
             }
-            else if(args.length >= 4)
+            else
             {
-                String content = args[3];
-                Material material = Material.matchMaterial(content.contains(":") ? content.split(":")[0] : content);
-                short data = Short.parseShort((content.contains(":") ? content.split(":")[1] : "-1"));
-                ItemStack input = new ItemStack(material, 1, data);
-                
-                FurnaceRecipe bukkitRecipe = new FurnaceRecipe(result, input.getData());
-                
-                if(data == -1)
-                {
-                    bukkitRecipe = new FurnaceRecipe(result, material);
-                }
-                
-                recipe.setBukkitRecipe(bukkitRecipe);
-                recipe.setDisableOthers(args.length >= 5 ? Boolean.parseBoolean(args[4]) : false);
-                recipe.setEnablePermission(false);
-                recipe.setTransferDamage(false);
-                
-                recipe.load();
-                Config.save();
-                RecipesManager.reload();
+                Inventory inv = Bukkit.createInventory(p, InventoryType.FURNACE);
+                inv.setItem(0, null);
+                inv.setItem(1, new ItemStack(Material.COAL));
+                p.openInventory(inv);
             }
+            
+            Bukkit.getScheduler().runTaskLater(instance, new Runnable()
+            {
+                
+                @Override
+                public void run()
+                {
+                    p.updateInventory();
+                }
+            }, 15);
+            
+            
             
             return true;
         }
