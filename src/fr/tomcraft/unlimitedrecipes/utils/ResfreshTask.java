@@ -1,7 +1,9 @@
-package fr.tomcraft.unlimitedrecipes;
+package fr.tomcraft.unlimitedrecipes.utils;
 
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import fr.tomcraft.unlimitedrecipes.URPlugin;
 
 public class ResfreshTask extends BukkitRunnable
 {

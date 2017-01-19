@@ -29,11 +29,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import fr.tomcraft.unlimitedrecipes.URecipe.RecipeType;
+import fr.tomcraft.unlimitedrecipes.utils.UpdateThread;
 
 public class RecipesListener implements Listener
 {
     
-    static int saveSlot = 17;
+    public static int saveSlot = 17;
     
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent e)

@@ -17,7 +17,6 @@ public class URecipe
     private boolean transferDamage;
     
     private boolean loaded = false;
-    private boolean hiden = false;
     
     public URecipe(Recipe bukkitRecipe, RecipeType type)
     {
@@ -88,17 +87,6 @@ public class URecipe
     public boolean transferDamage()
     {
         return transferDamage;
-    }
-    
-    public URecipe setHiden(boolean hide)
-    {
-        this.hiden = hide;
-        return this;
-    }
-    
-    public boolean isHiden()
-    {
-        return hiden;
     }
     
     public String getPermission()

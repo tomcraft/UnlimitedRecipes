@@ -18,6 +18,7 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
 import fr.tomcraft.unlimitedrecipes.URecipe.RecipeType;
+import fr.tomcraft.unlimitedrecipes.utils.UpdateThread;
 
 public class Config
 {
