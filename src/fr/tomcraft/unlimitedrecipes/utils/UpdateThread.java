@@ -1,5 +1,6 @@
 package fr.tomcraft.unlimitedrecipes.utils;
 
+import net.gravitydevelopment.updater.Updater;
 import net.gravitydevelopment.updater.Updater.UpdateResult;
 
 import org.bukkit.Bukkit;
@@ -10,7 +11,8 @@ import fr.tomcraft.unlimitedrecipes.URPlugin;
 
 public class UpdateThread implements Runnable
 {
-    
+
+    public static Updater updater;
     public static boolean updateChecking = true;
     public static boolean updateDownloading = false;
     public static boolean updateAvailable = false;
@@ -18,32 +20,32 @@ public class UpdateThread implements Runnable
     
     public static void start()
     {
-        if (UpdateThread.updateChecking && UpdateThread.task == null)
+        if (updateChecking && task == null)
         {
-            UpdateThread.task = Bukkit.getScheduler().runTaskTimerAsynchronously(URPlugin.instance, new UpdateThread(), 0L, 864000L);
+            task = Bukkit.getScheduler().runTaskTimerAsynchronously(URPlugin.instance, new UpdateThread(), 0L, 864000L);
         }
     }
     
     public static void stop()
     {
-        if (UpdateThread.task != null)
+        if (task != null)
         {
-            UpdateThread.task.cancel();
+            task.cancel();
         }
     }
     
     public static void restart()
     {
-        UpdateThread.stop();
-        UpdateThread.start();
+        stop();
+        start();
     }
     
     public static boolean checkUpdate()
     {
         URPlugin.renewUpdater();
-        if (URPlugin.updater.getResult() == UpdateResult.UPDATE_AVAILABLE)
+        if (updater.getResult() == UpdateResult.UPDATE_AVAILABLE)
         {
-            Bukkit.getConsoleSender().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + "[UnlimitedRecipes] " + ChatColor.RESET + ChatColor.RED + "An update is available," + (UpdateThread.updateDownloading ? " it will be applied on next restart." : " you can get it here: "));
+            Bukkit.getConsoleSender().sendMessage(ChatColor.BOLD + "" + ChatColor.RED + "[UnlimitedRecipes] " + ChatColor.RESET + ChatColor.RED + "An update is available," + (updateDownloading ? " it will be applied on next restart." : " you can get it here: "));
             Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "http://dev.bukkit.org/bukkit-plugins/unlimitedrecipes/");
             return true;
         }
@@ -53,6 +55,6 @@ public class UpdateThread implements Runnable
     @Override
     public void run()
     {
-        UpdateThread.updateAvailable = UpdateThread.checkUpdate();
+        updateAvailable = checkUpdate();
     }
 }

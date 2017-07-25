@@ -67,7 +67,7 @@ public class Tools
         URecipe uRecipe = RecipesManager.customRecipes.get(args[0]);
         if(uRecipe == null)
         {
-            player.sendMessage(ChatColor.RED + "Incorrect recipe name !");
+            player.sendMessage(ChatColor.RED + "Invalid recipe name !");
             return;
         }
         Recipe recipe = uRecipe.getBukkitRecipe();
@@ -129,15 +129,7 @@ public class Tools
             inv.setItem(0, recipe.getResult());
         }
         
-        Bukkit.getScheduler().runTaskLater(plugin, new Runnable()
-        {
-            
-            @Override
-            public void run()
-            {
-                player.updateInventory();
-            }
-        }, 15);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> player.updateInventory(), 15);
     }
     
 }

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -108,7 +108,6 @@ public class RecipesListener implements Listener
             
             if(uRecipe.getType() == RecipeType.FURNACE_RECIPE)
             {
-                
                 FurnaceRecipe recipe = new FurnaceRecipe(result, inventory.getItem(0).getData());
                 uRecipe.setBukkitRecipe(recipe);
             }
@@ -122,7 +121,7 @@ public class RecipesListener implements Listener
                 
                 if(uRecipe.getType() == RecipeType.SHAPED_RECIPE)
                 {
-                    ShapedRecipe recipe = new ShapedRecipe(result);
+                    ShapedRecipe recipe = new ShapedRecipe(new NamespacedKey(URPlugin.instance, uRecipe.getName()), result);
                     String[] shape = {"", "", ""};
                     
                     for(int i = 0; i < 9; i++)
@@ -221,7 +220,7 @@ public class RecipesListener implements Listener
                 }
                 else if(uRecipe.getType() == RecipeType.SHAPELESS_RECIPE)
                 {
-                    ShapelessRecipe recipe = new ShapelessRecipe(result);
+                    ShapelessRecipe recipe = new ShapelessRecipe(new NamespacedKey(URPlugin.instance, uRecipe.getName()), result);
                     
                     int i = 0;
                     for(ItemStack its : inv.getMatrix())
@@ -291,21 +290,7 @@ public class RecipesListener implements Listener
     public void onPlayerPrepareCraftEvent(final PrepareItemCraftEvent e)
     {
         if(URPlugin.craftMaking.containsKey(e.getView().getPlayer().getName()))
-        {
-            final ItemStack its = e.getInventory().getResult().clone();
-            
-            ((Player)e.getViewers().get(0)).updateInventory();
-            
-            Bukkit.getScheduler().runTaskLater(URPlugin.instance, new Runnable()
-            {
-                
-                @Override
-                public void run()
-                {
-                    e.getInventory().setResult(its);
-                }
-            }, 10);
-            
+        {        
             return;
         }
         

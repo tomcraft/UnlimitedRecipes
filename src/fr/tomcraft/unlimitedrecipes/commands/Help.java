@@ -15,13 +15,13 @@ public class Help
     
     public static final int maxLines = 10;
     
-    private static List<String> helps = Arrays.asList(
+    private static final List<String> helps = Arrays.asList(
             "Some commands needs you to have the item in your hand",
             "In a text put %player% to include the player name",
             "In a text put _ to make a space"
             );
     
-    private static List<String> usages = Arrays.asList(
+    private static final List<String> usages = Arrays.asList(
             "/ur help <page>",
             "/ur create <name> <shaped/shapeless> [disableOthers] [enablePermission] [transfertDurability]",
             "/ur create <name> furnace [disableOthers]",
@@ -38,6 +38,9 @@ public class Help
             "/ur item enchant add <enchant> <level>",
             "/ur item enchant list",
             "/ur item enchant reset",
+            "/ur item potion add <effect> <level>",
+            "/ur item potion list",
+            "/ur item potion reset",
             "/ur item unbreakable <true/false>",
             "/ur item skull <ownerName or %player%>",
             "/ur item hide attributes <true/false>",

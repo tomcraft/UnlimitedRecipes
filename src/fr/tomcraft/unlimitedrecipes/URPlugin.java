@@ -22,7 +22,6 @@ public class URPlugin extends JavaPlugin
 {
     
     public static URPlugin instance;
-    public static Updater updater;
 
     public static HashMap<String, URecipe> craftMaking = new HashMap<String, URecipe>();
     public static HashMap<String, ItemStack> craftMakingResultTMP = new HashMap<String, ItemStack>();
@@ -78,6 +77,6 @@ public class URPlugin extends JavaPlugin
     
     public static void renewUpdater()
     {
-        URPlugin.updater = new Updater(URPlugin.instance, 52907, URPlugin.instance.getFile(), UpdateThread.updateDownloading ? UpdateType.DEFAULT : UpdateType.NO_DOWNLOAD, false);
+        UpdateThread.updater = new Updater(URPlugin.instance, 52907, URPlugin.instance.getFile(), UpdateThread.updateDownloading ? UpdateType.DEFAULT : UpdateType.NO_DOWNLOAD, false);
     }
 }

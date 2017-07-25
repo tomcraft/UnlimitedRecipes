@@ -11,7 +11,10 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import fr.tomcraft.unlimitedrecipes.URPlugin;
 import fr.tomcraft.unlimitedrecipes.utils.CommandController.SubCommandHandler;
@@ -19,7 +22,7 @@ import fr.tomcraft.unlimitedrecipes.utils.CommandController.SubCommandHandler;
 public class ItemConfig
 {
     private URPlugin plugin = URPlugin.instance;
-    private static List<String> subCommands = Arrays.asList("rename", "lore", "enchant", "unbreakable", "skull", "flag");
+    private static List<String> subCommands = Arrays.asList("rename", "lore", "enchant", "potion", "unbreakable", "skull", "flag");
     
     @SubCommandHandler(name = "item", parent = "ur", permission = "ur.item")
     public void itemConfig(Player player, String args[])
@@ -31,7 +34,7 @@ public class ItemConfig
         }
         
         String action = args[0];
-        ItemStack item = player.getItemInHand();
+        ItemStack item = player.getInventory().getItemInMainHand();
         ItemMeta meta = item.getItemMeta();
         
         if(action.equalsIgnoreCase("rename") && args.length >= 2)
@@ -46,6 +49,10 @@ public class ItemConfig
         else if(action.equalsIgnoreCase("enchant"))
         {
             enchant(player, URPlugin.subArgs(args), meta);
+        }
+        else if(action.equalsIgnoreCase("potion"))
+        {
+            potion(player, URPlugin.subArgs(args), meta);
         }
         else if(action.equalsIgnoreCase("unbreakable") && args.length >= 2)
         {
@@ -79,7 +86,7 @@ public class ItemConfig
         if(meta != item.getItemMeta())
         {
             item.setItemMeta(meta);
-            player.sendMessage(ChatColor.GREEN + "Item in you hand was updated !");
+            player.sendMessage(ChatColor.GREEN + "Item in you hand has been updated !");
             return;
         }            
     }
@@ -163,6 +170,55 @@ public class ItemConfig
             for(Enchantment e : meta.getEnchants().keySet())
             {
                 meta.removeEnchant(e);
+            }
+        }
+    }
+    
+    public void potion(Player player, String args[], ItemMeta meta)
+    {
+        if(args.length == 0 || !Arrays.asList("add", "list", "reset").contains(args[0].toLowerCase()))
+        {
+            Help.showUsages(player, "/ur item potion");
+            return;
+        }
+        else if(args[0].equalsIgnoreCase("add") && args.length < 3)
+        {
+            Help.showUsages(player, "/ur item potion add");
+            return;
+        }
+        else if(!(meta instanceof PotionMeta))
+        {
+            player.sendMessage(ChatColor.RED + "Item must be potion effect-able !");
+            return;
+        }
+        
+        String action = args[0];
+        
+        if(action.equalsIgnoreCase("add"))
+        {
+            PotionEffectType e = PotionEffectType.getByName(args[1].toUpperCase());
+            if(e == null)
+            {
+                player.sendMessage(ChatColor.RED + "Invalid potion !");
+                return;
+            }
+            int level = Integer.parseInt(args[2]) + 1;
+            int duration = Integer.parseInt(args[3]);
+            PotionEffect effect = new PotionEffect(e, duration, level);
+            ((PotionMeta)meta).addCustomEffect(effect, true);
+        }
+        else if(action.equalsIgnoreCase("list"))
+        {
+            for(PotionEffectType e : PotionEffectType.values())
+            {
+                player.sendMessage(ChatColor.GREEN + " - " + e.getName());
+            }
+        }
+        else if(action.equalsIgnoreCase("reset"))
+        {
+            for(PotionEffect e : ((PotionMeta)meta).getCustomEffects())
+            {
+                ((PotionMeta)meta).removeCustomEffect(e.getType());
             }
         }
     }

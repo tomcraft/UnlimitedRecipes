@@ -24,7 +24,6 @@ public class ResfreshTask extends BukkitRunnable
             return;
         }
         player.getOpenInventory().getTopInventory().setItem(0, URPlugin.craftMakingResultTMP.get(player.getName()));
-        player.updateInventory();
     }
     
 }

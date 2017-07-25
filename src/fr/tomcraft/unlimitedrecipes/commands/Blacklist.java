@@ -17,7 +17,7 @@ import fr.tomcraft.unlimitedrecipes.utils.CommandController.SubCommandHandler;
 public class Blacklist
 {
     private URPlugin plugin = URPlugin.instance;
-    private static List<String> subCommands = Arrays.asList("on", "off", "add", "delete", "list");
+    private static final List<String> subCommands = Arrays.asList("on", "off", "add", "delete", "list");
     
     @SubCommandHandler(name = "blacklist", parent = "ur", permission = "ur.blacklist")
     public void blacklist(Player player, String args[])
@@ -30,7 +30,7 @@ public class Blacklist
         
         String action = args[0];
         boolean useData = args.length >= 2 ? Boolean.parseBoolean(args[1]) : true;
-        ItemStack item = player.getItemInHand();
+        ItemStack item = player.getInventory().getItemInMainHand();
         ArrayList<String> blackList = RecipesManager.blacklist;
         
         if(action.equalsIgnoreCase("on"))

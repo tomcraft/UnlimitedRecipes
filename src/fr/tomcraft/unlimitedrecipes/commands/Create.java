@@ -59,7 +59,7 @@ public class Create
         if(type != RecipeType.FURNACE_RECIPE)
         {
             player.openWorkbench(player.getLocation(), true);
-            new ResfreshTask(player).runTaskTimer(plugin, 0, 5);
+            new ResfreshTask(player).runTaskTimer(plugin, 0, 1);
         }
         else
         {
@@ -69,14 +69,6 @@ public class Create
             player.openInventory(inv);
         }
         
-        Bukkit.getScheduler().runTaskLater(plugin, new Runnable()
-        {
-            
-            @Override
-            public void run()
-            {
-                player.updateInventory();
-            }
-        }, 15);
+        Bukkit.getScheduler().runTaskLater(plugin, () -> player.updateInventory(), 15);
     }
 }
