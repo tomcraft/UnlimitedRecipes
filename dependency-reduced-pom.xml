@@ -4,7 +4,7 @@
   <groupId>fr.tomcraft</groupId>
   <artifactId>UnlimitedRecipes</artifactId>
   <name>UnlimitedRecipes</name>
-  <version>3.2</version>
+  <version>3.3</version>
   <url>https://github.com/tomcraft/UnlimitedRecipes</url>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -20,15 +20,15 @@
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.0</version>
+        <version>3.6.1</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>2.3</version>
+        <version>3.0.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -70,9 +70,9 @@
   <dependencies>
     <dependency>
       <groupId>org.spigotmc</groupId>
-      <artifactId>spigot-api</artifactId>
-      <version>1.9-R0.1-SNAPSHOT</version>
-      <scope>compile</scope>
+      <artifactId>spigot</artifactId>
+      <version>1.12-R0.1-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <properties>

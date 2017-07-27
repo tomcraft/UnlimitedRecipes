@@ -3,6 +3,7 @@ package fr.tomcraft.unlimitedrecipes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -19,6 +20,7 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.CraftingInventory;
+import org.bukkit.inventory.FurnaceInventory;
 import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -39,7 +41,7 @@ public class RecipesListener implements Listener
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent e)
     {
-        if (UpdateThread.updateAvailable && URPlugin.hasPermission(e.getPlayer(), "ur.update"))
+        if (UpdateThread.updateAvailable && e.getPlayer().hasPermission("ur.update"))
         {
             e.getPlayer().sendMessage(ChatColor.RED + "[UnlimitedRecipes] An update is available," + (UpdateThread.updateDownloading ? " it will be applied on next restart." : " you can get it here: "));
             e.getPlayer().sendMessage(ChatColor.RED + "http://dev.bukkit.org/bukkit-plugins/unlimitedrecipes/ (click)");
@@ -264,7 +266,17 @@ public class RecipesListener implements Listener
         Player p = (Player)e.getPlayer();
         if(URPlugin.craftMaking.containsKey(p.getName()))
         {
-            e.getPlayer().getInventory().addItem(e.getView().getTopInventory().getContents());
+            if(e.getView().getTopInventory() instanceof FurnaceInventory)
+            {
+                e.getView().getTopInventory().setItem(1, null);
+            }
+            
+            List<ItemStack> toGiveBack = Arrays.asList(e.getView().getTopInventory().getContents());
+            
+            while(toGiveBack.contains(null))
+                toGiveBack.remove(null);
+            
+            e.getPlayer().getInventory().addItem(toGiveBack.toArray(new ItemStack[toGiveBack.size()]));
             e.getView().getTopInventory().clear();
             e.getPlayer().getInventory().setItem(saveSlot, null);
             URPlugin.craftMaking.remove(p.getName());
@@ -295,12 +307,16 @@ public class RecipesListener implements Listener
         }
         
         Recipe recipe = e.getRecipe();
+        if(recipe == null)
+        {
+            return;
+        }
         ItemStack result = recipe.getResult();
         URecipe custRecipe = RecipesManager.getURecipeByRecipe(recipe);
         
         if (custRecipe != null)
         {
-            if (custRecipe.enablePermission() && !URPlugin.hasPermission(e.getView().getPlayer(), custRecipe.getPermission()))
+            if (custRecipe.enablePermission() && !e.getView().getPlayer().hasPermission(custRecipe.getPermission()))
             {
                 e.getInventory().setResult(null);
                 return;

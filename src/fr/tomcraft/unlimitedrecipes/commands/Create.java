@@ -26,13 +26,13 @@ public class Create
     @SubCommandHandler(name = "create", parent = "ur", permission = "ur.create")
     public void create(final Player player, String args[])
     {
-        if(args.length < 2)
+        if(args.length < 3)
         {
             Help.showUsages(player, "/ur create");
             return;
         }
         
-        RecipeType type = RecipeType.fromName(args[1]);
+        RecipeType type = RecipeType.fromName(args[2]);
         
         if(type == null)
         {
@@ -42,11 +42,11 @@ public class Create
         }
         
         URecipe recipe = new URecipe(null, type);
-        recipe.setName(args[0]);
+        recipe.setName(args[1]);
         
-        recipe.setDisableOthers(args.length >= 3 ? Boolean.parseBoolean(args[2]) : false);
-        recipe.setEnablePermission(args.length >= 4 ? Boolean.parseBoolean(args[3]) : false);
-        recipe.setTransferDamage(args.length >= 5 ? Boolean.parseBoolean(args[4]) : true);
+        recipe.setDisableOthers(args.length >= 4 ? Boolean.parseBoolean(args[3]) : false);
+        recipe.setEnablePermission(args.length >= 5 ? Boolean.parseBoolean(args[4]) : false);
+        recipe.setTransferDamage(args.length >= 6 ? Boolean.parseBoolean(args[5]) : true);
         URPlugin.craftMaking.put(player.getName(), recipe);
         
         ItemStack wool = new ItemStack(Material.WOOL, 1, DyeColor.LIME.getWoolData());
@@ -63,9 +63,10 @@ public class Create
         }
         else
         {
-            Inventory inv = Bukkit.createInventory(player, InventoryType.FURNACE);
+            Inventory inv = Bukkit.createInventory(player, InventoryType.FURNACE, "Create a furnace recipe");
             inv.setItem(0, null);
             inv.setItem(1, new ItemStack(Material.COAL));
+            inv.setItem(2, null);
             player.openInventory(inv);
         }
         

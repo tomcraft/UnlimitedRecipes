@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -37,7 +38,7 @@ public class Config
         Config.loadBlackListedRecipes();
         Config.loadCraftingRecipes();
         Config.loadFurnaceRecipes();
-        RecipesManager.registerRecipes();
+        RecipesManager.reload();
     }
     
     public static void save()
@@ -111,13 +112,14 @@ public class Config
                 boolean disableOthers = config.getBoolean("disableOthers", false);
                 boolean transferDurability = config.getBoolean("transferDamage", config.getBoolean("transferDurability", true));
                 
+                NamespacedKey key = new NamespacedKey(URPlugin.instance, name);
                 ItemStack result = config.getItemStack("result");
                 
                 Recipe bukkitRecipe;
                 
                 if(recipeType == RecipeType.SHAPELESS_RECIPE)
                 {
-                    ShapelessRecipe recipe = new ShapelessRecipe(result);
+                    ShapelessRecipe recipe = new ShapelessRecipe(key, result);
                     for(Object o : config.getList("ingredients"))
                     {
                         ItemStack ing = (ItemStack)o;
@@ -134,7 +136,7 @@ public class Config
                 }
                 else if(recipeType == RecipeType.SHAPED_RECIPE)
                 {
-                    ShapedRecipe recipe = new ShapedRecipe(result);
+                    ShapedRecipe recipe = new ShapedRecipe(key, result);
                     List<String> shape_list = config.getStringList("shape");
                     String[] shape = new String[shape_list.size()];
                     recipe.shape(shape_list.toArray(shape));

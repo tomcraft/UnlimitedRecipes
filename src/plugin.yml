@@ -5,4 +5,4 @@ version: ${project.version}
 depend: []
 commands:
     ur:
-        description: Reload recipes
+        description: Main command

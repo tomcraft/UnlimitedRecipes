@@ -1,8 +1,8 @@
 package fr.tomcraft.unlimitedrecipes;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -11,12 +11,22 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapelessRecipe;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import fr.tomcraft.unlimitedrecipes.utils.CustomRecipeRegistry;
+import net.minecraft.server.v1_12_R1.CraftingManager;
+import net.minecraft.server.v1_12_R1.IRecipe;
+import net.minecraft.server.v1_12_R1.MinecraftKey;
+import net.minecraft.server.v1_12_R1.RegistryMaterials;
+
 public class RecipesManager
 {
-    
-    public static HashMap<String, URecipe> customRecipes = new HashMap<String, URecipe>();
-    public static ArrayList<String> blacklist = new ArrayList<String>();
-    
+
+    private static RegistryMaterials<MinecraftKey, IRecipe> recipeRegistry;
+    public static Map<String, URecipe> customRecipes = Maps.newHashMap();
+    public static List<String> blacklist = Lists.newArrayList();
+
     public static void reset()
     {
         Bukkit.resetRecipes();
@@ -68,14 +78,15 @@ public class RecipesManager
         
         Config.LOG.info("[UnlimitedRecipes] All recipes were loaded ! (" + customRecipes.size() + " recipes)");
     }
-    
     public static void unloadBukkitRecipes(Material material, Short data)
     {
+        ensurePatchedRegistry();
+        
         Iterator<Recipe> it = Bukkit.recipeIterator();
-        Recipe recipe;
+        
         while (it.hasNext())
         {
-            recipe = it.next();
+            Recipe recipe = it.next();
             ItemStack item = recipe.getResult();
             if (recipe != null && item.getType() == material && (data != null ? item.getDurability() == data : true))
             {
@@ -137,34 +148,9 @@ public class RecipesManager
         return customRecipes.get(name);
     }
     
-    /*
-    public static URecipe getCustomRecipeByResult(String result)
-    {
-        for (URecipe cust : RecipesManager.customRecipes)
-        {
-            ItemStack its = cust.bukkitRecipe.getResult();
-            if ((its.getType().name() + ":" + its.getDurability()).equals(result))
-            {
-                return cust;
-            }
+    protected static void ensurePatchedRegistry() {
+        if (CraftingManager.recipes != recipeRegistry) {
+            CraftingManager.recipes = recipeRegistry = new CustomRecipeRegistry(CraftingManager.recipes);
         }
-        return null;
     }
-    
-    public static URecipe getCustomRecipeByName(String name)
-    {
-        for (URecipe cust : RecipesManager.customRecipes)
-        {
-            if (cust.name.equalsIgnoreCase(name))
-            {
-                return cust;
-            }
-        }
-        return null;
-    }
-    
-    public static boolean isCustomRecipe(Recipe recipe)
-    {
-        return RecipesManager.getCustomRecipeByRecipe(recipe) != null;
-    }*/
 }

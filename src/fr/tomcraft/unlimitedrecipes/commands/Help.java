@@ -67,7 +67,7 @@ public class Help
     
     public static void showUsages(CommandSender sender, String command)
     {
-        List<String> usages = getUsages(null);
+        List<String> usages = getUsages(command);
         for(String usage : usages)
         {
             sender.sendMessage(ChatColor.RED + "Usage: " + usage);
@@ -116,7 +116,7 @@ public class Help
     @SubCommandHandler(name = "help", parent = "ur")
     public void help(CommandSender sender, String args[])
     {
-        int page = args.length >= 1 ? Integer.parseInt(args[0]) : 0;
-        showHelp(sender, page);
+        int page = args.length >= 2 ? Integer.parseInt(args[1]) : 1;
+        showHelp(sender, page - 1);
     }
 }

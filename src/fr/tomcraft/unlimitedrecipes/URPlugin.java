@@ -51,16 +51,6 @@ public class URPlugin extends JavaPlugin
         return Config.furnace;
     }
     
-    public static String[] subArgs(String[] args)
-    {
-        String[] subArgs = new String[args.length - 1];
-        for (int i = 1; i < args.length; i++)
-        {
-            subArgs[i - 1] = args[i];
-        }
-        return subArgs;
-    }
-    
     @Override
     public void reloadConfig()
     {
@@ -68,11 +58,6 @@ public class URPlugin extends JavaPlugin
         RecipesManager.reset();
         Config.load();
         UpdateThread.restart();
-    }
-    
-    public static boolean hasPermission(CommandSender sender, String perm)
-    {
-        return sender.hasPermission(perm) || sender.isOp();
     }
     
     public static void renewUpdater()

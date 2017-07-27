@@ -38,12 +38,12 @@ public class Tools
     @SubCommandHandler(name = "delete", parent = "ur", permission = "ur.delete")
     public void delete(CommandSender sender, String args[])
     {
-        if(args.length == 0)
+        if(args.length == 1)
         {
             Help.showUsages(sender, "/ur delete");
             return;
         }
-        RecipesManager.customRecipes.remove(args[0]);
+        RecipesManager.customRecipes.remove(args[1]);
         Config.save();
         RecipesManager.reload();
         sender.sendMessage(ChatColor.GREEN + "Recipe deleted !");
@@ -59,12 +59,12 @@ public class Tools
     @SubCommandHandler(name = "view", parent = "ur", permission = "ur.view")
     public void view(final Player player, String args[])
     {
-        if(args.length == 0)
+        if(args.length == 1)
         {
             Help.showUsages(player, "/ur view");
             return;
         }
-        URecipe uRecipe = RecipesManager.customRecipes.get(args[0]);
+        URecipe uRecipe = RecipesManager.customRecipes.get(args[1]);
         if(uRecipe == null)
         {
             player.sendMessage(ChatColor.RED + "Invalid recipe name !");

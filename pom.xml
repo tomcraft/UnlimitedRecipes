@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.tomcraft</groupId>
 	<artifactId>UnlimitedRecipes</artifactId>
-	<version>3.2.2</version>
+	<version>3.3</version>
 	<name>UnlimitedRecipes</name>
 	<url>https://github.com/tomcraft/UnlimitedRecipes</url>
 	<properties>
@@ -28,7 +28,7 @@
 	<dependencies>
 		<dependency>
         	<groupId>org.spigotmc</groupId>
-       	 	<artifactId>spigot-api</artifactId>
+       	 	<artifactId>spigot</artifactId>
        	 	<version>1.12-R0.1-SNAPSHOT</version>
         	<scope>provided</scope>
     	</dependency>

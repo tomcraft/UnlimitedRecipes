@@ -27,51 +27,51 @@ public class ItemConfig
     @SubCommandHandler(name = "item", parent = "ur", permission = "ur.item")
     public void itemConfig(Player player, String args[])
     {
-        if(args.length == 0 || !subCommands.contains(args[0].toLowerCase()))
+        if(args.length == 1 || !subCommands.contains(args[1].toLowerCase()))
         {
             Help.showUsages(player, "/ur item");
             return;
         }
         
-        String action = args[0];
+        String action = args[1];
         ItemStack item = player.getInventory().getItemInMainHand();
         ItemMeta meta = item.getItemMeta();
         
-        if(action.equalsIgnoreCase("rename") && args.length >= 2)
+        if(action.equalsIgnoreCase("rename") && args.length >= 3)
         {
-            String name = ChatColor.translateAlternateColorCodes('&', args[1].replace("_", " "));
+            String name = ChatColor.translateAlternateColorCodes('&', args[2].replace("_", " "));
             meta.setDisplayName(name);
         }
         else if(action.equalsIgnoreCase("lore"))
         {
-            lore(player, URPlugin.subArgs(args), meta);
+            lore(player, subArgs(args), meta);
         }
         else if(action.equalsIgnoreCase("enchant"))
         {
-            enchant(player, URPlugin.subArgs(args), meta);
+            enchant(player, subArgs(args), meta);
         }
         else if(action.equalsIgnoreCase("potion"))
         {
-            potion(player, URPlugin.subArgs(args), meta);
+            potion(player, subArgs(args), meta);
         }
-        else if(action.equalsIgnoreCase("unbreakable") && args.length >= 2)
+        else if(action.equalsIgnoreCase("unbreakable") && args.length >= 3)
         {
-            meta.spigot().setUnbreakable(Boolean.parseBoolean(args[1]));
+            meta.spigot().setUnbreakable(Boolean.parseBoolean(args[2]));
         }
-        else if(action.equalsIgnoreCase("skull") && args.length >= 2)
+        else if(action.equalsIgnoreCase("skull") && args.length >= 3)
         {
-            String name = args[1];
+            String name = args[2];
             if(meta instanceof SkullMeta)
             {
                 ((SkullMeta)meta).setOwner(name);
             }
         }
-        else if(action.equalsIgnoreCase("hide") && args.length >= 3)
+        else if(action.equalsIgnoreCase("hide") && args.length >= 4)
         {
-            ItemFlag flag = ItemFlag.valueOf("HIDE_"+args[1].toUpperCase());
+            ItemFlag flag = ItemFlag.valueOf("HIDE_"+args[2].toUpperCase());
             if(flag != null)
             {
-                boolean state = Boolean.parseBoolean(args[2]);
+                boolean state = Boolean.parseBoolean(args[3]);
                 if(state)
                 {
                     meta.addItemFlags(flag);
@@ -221,5 +221,16 @@ public class ItemConfig
                 ((PotionMeta)meta).removeCustomEffect(e.getType());
             }
         }
+    }
+    
+    public static String[] subArgs(String[] args)
+    {
+        int trim = 2;
+        String[] subArgs = new String[args.length - trim];
+        for (int i = trim; i < args.length; i++)
+        {
+            subArgs[i - trim] = args[i];
+        }
+        return subArgs;
     }
 }

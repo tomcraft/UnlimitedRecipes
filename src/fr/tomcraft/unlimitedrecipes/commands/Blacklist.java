@@ -22,16 +22,16 @@ public class Blacklist
     @SubCommandHandler(name = "blacklist", parent = "ur", permission = "ur.blacklist")
     public void blacklist(Player player, String args[])
     {
-        if(args.length == 0 || !subCommands.contains(args[0].toLowerCase()))
+        if(args.length == 1 || !subCommands.contains(args[1].toLowerCase()))
         {
             Help.showUsages(player, "/ur blacklist");
             return;
         }
         
-        String action = args[0];
-        boolean useData = args.length >= 2 ? Boolean.parseBoolean(args[1]) : true;
+        String action = args[1];
+        boolean useData = args.length >= 3 ? Boolean.parseBoolean(args[2]) : true;
         ItemStack item = player.getInventory().getItemInMainHand();
-        ArrayList<String> blackList = RecipesManager.blacklist;
+        List<String> blackList = RecipesManager.blacklist;
         
         if(action.equalsIgnoreCase("on"))
         {
